@@ -46,13 +46,13 @@
             {$form.Email.html}
         </div>
     </div>
-    {*
+{*
     <div class="row form-group">
         <label class="col-sm-2">
-            {$form.Password_md5.label}
+            {$form.Password_hash.label}
         </label>
         <div class="col-sm-10">
-            {$form.Password_md5.html}
+            {$form.Password_hash.html}
         </div>
     </div>
     <div class="row form-group">
@@ -63,14 +63,27 @@
             {$form.__Confirm.html}
         </div>
     </div>
-    i*}
-    <div class="row form-group">
-        <label class="col-sm-2">
-            {$form.Doc_Repo_Notifications.label}
-        </label>
-        <div class="col-sm-10">
-            {$form.Doc_Repo_Notifications.html}
-        </div>
+*}
+    <br><br>
+    <h3>Notifications</h3>
+    <table class="table table-instrument" >
+        <thead>
+            {foreach key=gkey item=gitem from=$form.notification_headers.elements}
+                <th style="color: black">{$gitem.html}</th>
+            {/foreach}
+        </thead>
+        <tbody>
+            {foreach key=opkey item=op from=$notification_rows}
+                <tr>
+                    {foreach key=rkey item=ritem from=$form.{$op}.elements}
+                        <td>{$ritem.html}</td>
+                    {/foreach}
+                </tr>
+            {/foreach}
+        </tbody>
+    </table>
+    <div>
+
     </div>
     <div class="row form-group">
         <div class="col-sm-2">
@@ -80,5 +93,7 @@
             <input class="btn btn-sm btn-primary col-xs-12" value="Reset" type="reset" />
         </div>
     </div>
+
+
 {$form.hidden}
 </form>
