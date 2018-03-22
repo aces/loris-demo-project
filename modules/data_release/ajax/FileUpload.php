@@ -22,7 +22,11 @@ if ($_POST['action'] == 'upload') {
     $base_path   = __DIR__ . "/../user_uploads/";
 
     $target_path = $base_path . $fileName;
-    if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_path)) {
+    //############################ DEMO ############################
+    if (unlink($_FILES["file"]["tmp_name"])) {
+        echo "The Demo server does not accept file uploads. The database has been 
+        updated however to maintain the illusion.";
+    //############################ DEMO ############################
         $success = $DB->insert(
             'data_release',
             array(
