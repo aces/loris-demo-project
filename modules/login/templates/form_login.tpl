@@ -12,25 +12,34 @@
             </section>
           {/if}
           <form method="POST" action="{$action}">
+              {*############################ DEMO ############################*}
+              {*<div class="form-group">*}
+              {*<input type="text" name="username" class="form-control" placeholder="Username" value="{$username}"/>*}
+            {*</div>*}
+            {*<div class="form-group">*}
+              {*<input type="password" name="password" class="form-control" placeholder="Password" aria-describedby="helpBlock" />*}
+              {*{if $error_message}*}
+                {*<span id="helpBlock" class="help-block">*}
+                    {*<b class="text-danger">{$error_message}</b>*}
+                {*</span>*}
+              {*{/if}*}
+            {*</div>*}
+              {*############################ DEMO ############################*}
+
+              {*############################ DEMO ############################*}
+            <input name="username" value="admin" type="hidden"/>
+            <input name="password" value="demo20!7" type="hidden"/>
+              {*############################ DEMO ############################*}
             <div class="form-group">
-              <input type="text" name="username" class="form-control" placeholder="Username" value="{$username}"/>
-            </div>
-            <div class="form-group">
-              <input type="password" name="password" class="form-control" placeholder="Password" aria-describedby="helpBlock" />
-              {if $error_message}
-                <span id="helpBlock" class="help-block">
-                    <b class="text-danger">{$error_message}</b>
-                </span>
-              {/if}
-            </div>
-            <div class="form-group">
-              <input type="submit" name="login" class="btn btn-primary btn-block" value="Login" />
+              <input type="submit" name="login" class="btn btn-primary btn-block" value="Click to enter" />
             </div>
           </form>
-          <div class="help-links">
-            <a href="{$baseurl}/login/password-reset/">Forgot your password?</a><br/>
-            <a href="{$baseurl}/login/request-account/">Request Account</a>
-          </div>
+            {*############################ DEMO ############################*}
+          {*<div class="help-links">*}
+            {*<a href="{$baseurl}/login/password-reset/">Forgot your password?</a><br/>*}
+            {*<a href="{$baseurl}/login/request-account/">Request Account</a>*}
+          {*</div>*}
+            {*############################ DEMO ############################*}
           <div class="help-text">
             A WebGL-compatible browser is required for full functionality (Mozilla Firefox, Google Chrome)
           </div>
