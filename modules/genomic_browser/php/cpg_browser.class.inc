@@ -4,29 +4,29 @@
  * Displays targeted CpG islands data.
  * Filterable by candidate, gene or variant fields.
  *
- * PHP version 5
+ * PHP version 7
  *
- *  @category Genomic
- *  @package  Main
+ *  @category LORIS_Module
+ *  @package  Genomics
  *  @author   Xavier <xavierlb.mavan@gmail.com>
  *  @license  http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
  *  @link     https://www.github.com/aces/Loris/
  */
+namespace LORIS\genomic_browser;
 
-require_once 'NDB_Menu_Filter.class.inc';
 /**
- * NDB_Menu_Filter_CPG_Browser Class
+ * CPG_Browser Class
  *
  * This class is cpg_browser Form
  * CpG submenu tab for Genomic Browser
  *
- * @category Genomic
- * @package  Main
+ * @category LORIS_Module
+ * @package  Genomics
  * @author   Loris team <info-loris.mni@mcgill.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
  * @link     https://github.com/aces/Loris
 */
-class NDB_Menu_Filter_CpG_Browser extends NDB_Menu_Filter
+class CpG_Browser extends \NDB_Menu_Filter
 {
 
     /**
@@ -51,7 +51,7 @@ class NDB_Menu_Filter_CpG_Browser extends NDB_Menu_Filter
     function _hasAccess()
     {
         // create user object
-        $user = User::singleton();
+        $user = \User::singleton();
         return ($user->hasPermission('genomic_browser_view_allsites')
                 || $user->hasPermission('genomic_browser_view_site'));
     }
@@ -77,9 +77,9 @@ class NDB_Menu_Filter_CpG_Browser extends NDB_Menu_Filter
                                 'gscr.sample_label as Sample',
                                 'cpg.cpg_name as cpg_name',
                                 'cpg.beta_value as Beta_value',
-                                'genome_loc.Chromosome as Chromosome',
-                                'genome_loc.Strand as Strand',
-                                'genome_loc.StartLoc as StartLoc',
+                                'gca.Chromosome as Chromosome',
+                                'gca.Strand as Strand',
+                                'gca.StartLoc as StartLoc',
                                 'gca.address_id_a as Probe_Loc_A',
                                 'gca.probe_seq_a as Probe_Seq_A',
                                 'gca.address_id_b as Probe_Loc_B',
@@ -154,16 +154,14 @@ class NDB_Menu_Filter_CpG_Browser extends NDB_Menu_Filter
                 ON (gscr.sample_label = cpg.sample_label)
             LEFT JOIN genomic_cpg_annotation gca
                 USING (cpg_name)
-            LEFT JOIN genome_loc
-                ON (genome_loc.GenomeLocID = gca.location_id)
             LEFT JOIN genotyping_platform platform
                 ON (gca.platform_id = platform.PlatformID)
             WHERE 
             cpg.beta_value IS NOT NULL AND 
             candidate.Entity_type = 'Human' AND candidate.Active = 'Y' ";
 
-        $DB   = Database::singleton();
-        $user = User::singleton();
+        $DB   = \Database::singleton();
+        $user = \User::singleton();
 
         if (!$user->hasPermission('genomic_browser_view_allsites')) {
             $site_arr     = implode(",", $user->getCenterIDs());
@@ -184,10 +182,10 @@ class NDB_Menu_Filter_CpG_Browser extends NDB_Menu_Filter
                                'show_brief_results',
                                'cpg.cpg_name',
                                'cpg.beta_value',
-                               'genome_loc.Chromosome',
-                               'genome_loc.Strand',
-                               'genome_loc.StartLoc',
-                               'genome_loc.EndLoc',
+                               'gca.Chromosome',
+                               'gca.Strand',
+                               'gca.StartLoc',
+                               'gca.EndLoc',
                                'genomic_range',
                                'gca.gene_name',
                                'gca.genome_build',
@@ -216,12 +214,12 @@ class NDB_Menu_Filter_CpG_Browser extends NDB_Menu_Filter
                                'Show_Brief_Results' => 'show_brief_results',
                                'cpg_name'           => 'cpg.cpg_name',
                                'Beta_value'         => 'cpg.beta_value',
-                               'Chromosome'         => 'genome_loc.Chromosome',
+                               'Chromosome'         => 'gca.Chromosome',
                                'Gene_Symbol'        => 'gca.gene_name',
                                'Platform'           => 'platform.Name',
-                               'Strand'             => 'genome_loc.Strand',
-                               'StartLoc'           => 'genome_loc.StartLoc',
-                               'EndLoc'             => 'genome_loc.EndLoc',
+                               'Strand'             => 'gca.Strand',
+                               'StartLoc'           => 'gca.StartLoc',
+                               'EndLoc'             => 'gca.EndLoc',
                                'genomic_range'      => 'genomic_range',
                                'Assembly'           => 'gca.genome_build',
                                'Context'            => 'gca.island_relation',
@@ -244,46 +242,42 @@ class NDB_Menu_Filter_CpG_Browser extends NDB_Menu_Filter
                                   'cpg.cpg_name',
                                   'gca.genome_build',
                                   'gca.design_type',
-                                  'genome_loc.Strand',
+                                  'gca.Strand',
                                  );
 
         return true;
     }
 
     /**
-     * Sets the template data for the filter form
+     * Does the setup required for this page. By default, sets up elements
+     * that are common to every type of page. May be overridden by a specific
+     * page or specific page type.
      *
-     * @note   overloaded function
-     * @return bool
+     * @return none
      */
-    function _setFilterForm()
+    function setup()
     {
+        parent::setup();
+
         // create user object
-        $user = User::singleton();
+        $user = \User::singleton();
 
         // PSC
         if ($user->hasPermission('genomic_browser_view_allsites')) {
             // has access to all sites genomic data
             // get the list of study sites - to be replaced by the Site object
-            $list_of_sites = Utility::getSiteList();
+            $list_of_sites = \Utility::getSiteList();
             if (is_array($list_of_sites)) {
                 $list_of_sites = array('' => 'Any') + $list_of_sites;
             }
         } else {
             // allow only to view own site data
-            $list_of_sites = array();
-            $site_arr      = $user->getData('CenterIDs');
-            foreach ($site_arr as $key => $val) {
-                $site[$key] = &Site::singleton($val);
-                if ($site[$key]->isStudySite()) {
-                    $list_of_sites[$val] = $site[$key]->getCenterName();
-                }
-                $list_of_sites = array('' => 'All User Sites') + $list_of_sites;
-            }
+            $list_of_sites = $user->getStudySites();
+            $list_of_sites = array('' => 'All User Sites') + $list_of_sites;
         }
 
         // SubprojectID
-        $list_of_subprojects = Utility::getSubprojectList();
+        $list_of_subprojects = \Utility::getSubprojectList();
 
         // ------------------------------------------------------------
         // ----------------- Candidate Filters --------------------
@@ -475,14 +469,14 @@ class NDB_Menu_Filter_CpG_Browser extends NDB_Menu_Filter
             } elseif ($field == "genomic_range") {
                 $temp_array = explode(':', $val);
                 $chr        = $temp_array[0];
-                $query     .= " AND genome_loc.Chromosome = '$chr'";
+                $query     .= " AND gca.Chromosome = '$chr'";
 
                 if (!empty($temp_array[1]) AND strpos($temp_array[1], '-') ) {
                     $temp_array = explode('-', $temp_array[1]);
                     $from       = $temp_array[0];
                     $to         = $temp_array[1];
-                    $query     .= " AND genome_loc.StartLoc < $to";
-                    $query     .= " AND genome_loc.EndLoc > $from";
+                    $query     .= " AND gca.StartLoc < $to";
+                    $query     .= " AND gca.EndLoc > $from";
                 }
 
                 $query .= " AND :v_$prepared_key IS NOT NULL";
@@ -508,7 +502,7 @@ class NDB_Menu_Filter_CpG_Browser extends NDB_Menu_Filter
      */
     function getJSDependencies()
     {
-        $factory = NDB_Factory::singleton();
+        $factory = \NDB_Factory::singleton();
         $baseURL = $factory->settings()->getBaseURL();
         $deps    = parent::getJSDependencies();
         return array_merge(
@@ -532,7 +526,7 @@ class NDB_Menu_Filter_CpG_Browser extends NDB_Menu_Filter
      */
     function getDistinctValues( $table, $column)
     {
-        $DB      = Database::singleton();
+        $DB      = \Database::singleton();
         $results = $DB->pselect(
             "SELECT DISTINCT $column FROM $table ",
             array()

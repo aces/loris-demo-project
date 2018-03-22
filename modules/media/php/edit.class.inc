@@ -10,6 +10,7 @@
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/aces/CCNA/
  */
+namespace LORIS\media;
 
 /**
  * Creates the form for NDB_Form_media
@@ -20,31 +21,22 @@
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/aces/CCNA/
  */
-class NDB_Form_Media extends NDB_Form
+class Edit extends \NDB_Form
 {
-    /**
-     * Override default behaviour, since the page is loaded from editIndex.js
-     *
-     * @return void
-     * @access public
-     */
-    function display()
-    {
-        return null;
-    }
+    public $skipTemplate = true;
 
     /**
      * Entry point for /media/edit/
      * Checks if file id is provided and otherwise redirects to /media/ page
      *
-     * @throws DatabaseException
-     *
-     * @return void
+     * @return none
      */
-    function edit()
+    function setup()
     {
-        $db      =& Database::singleton();
-        $factory = NDB_Factory::singleton();
+        parent::setup();
+
+        $db      =& \Database::singleton();
+        $factory = \NDB_Factory::singleton();
         $baseURL = $factory->settings()->getBaseURL();
 
         $idMediaFile = $_GET['id'];
@@ -52,8 +44,8 @@ class NDB_Form_Media extends NDB_Form
         // Check if media file exists, if not redirect to /media/ page
         if (isset($idMediaFile)) {
             $result = $db->pselectRow(
-                "SELECT id FROM media WHERE id = $idMediaFile",
-                []
+                "SELECT id FROM media WHERE id = :mid",
+                array('mid' => $idMediaFile)
             );
             if (count($result) < 1) {
                 header('Location: ' . $baseURL . '/media/');
@@ -71,7 +63,7 @@ class NDB_Form_Media extends NDB_Form
      */
     function getCSSDependencies()
     {
-        $factory = NDB_Factory::singleton();
+        $factory = \NDB_Factory::singleton();
         $baseURL = $factory->settings()->getBaseURL();
         $deps    = parent::getCSSDependencies();
         return array_merge(
@@ -88,7 +80,7 @@ class NDB_Form_Media extends NDB_Form
      */
     function getJSDependencies()
     {
-        $factory = NDB_Factory::singleton();
+        $factory = \NDB_Factory::singleton();
         $baseURL = $factory->settings()->getBaseURL();
         $deps    = parent::getJSDependencies();
         return array_merge(
@@ -106,7 +98,7 @@ class NDB_Form_Media extends NDB_Form
     function _hasAccess()
     {
         //create user object
-        $user =& User::singleton();
+        $user =& \User::singleton();
 
         return $user->hasPermission('media_write');
     }

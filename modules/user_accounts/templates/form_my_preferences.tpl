@@ -46,7 +46,6 @@
             {$form.Email.html}
         </div>
     </div>
-{*
     <div class="row form-group">
         <label class="col-sm-2">
             {$form.Password_hash.label}
@@ -63,7 +62,6 @@
             {$form.__Confirm.html}
         </div>
     </div>
-*}
     <br><br>
     <h3>Notifications</h3>
     <table class="table table-instrument" >

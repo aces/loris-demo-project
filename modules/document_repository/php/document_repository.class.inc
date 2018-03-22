@@ -10,7 +10,7 @@
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/Jkat/Loris-Trunk/
  */
-
+namespace LORIS\document_repository;
 /**
  * Document Repository Class
  *
@@ -22,11 +22,12 @@
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://www.github.com/Jkat/Loris-Trunk/
 */
-class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
+class Document_Repository extends \NDB_Menu_Filter
 {
 
     var $centerIDMap;
     var $treeToArray = array();
+
     /**
      * Checking user permissions
      *
@@ -34,25 +35,26 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
      */
     function _hasAccess()
     {
-
         //create user object
-        $user =& User::singleton();
+        $user =& \User::singleton();
 
         return $user->hasPermission('document_repository_view')
                || $user->hasPermission('document_repository_delete');
 
     }
+
     /**
-     * Setup variables function
+     * Function _setupVariables
      *
-     * @return unknown
+     * @return none
      */
     function _setupVariables()
     {
-        $user =& User::singleton();
+
+        $user =& \User::singleton();
 
         // create the centerID map
-        $db      =& Database::singleton();
+        $db      =& \Database::singleton();
         $pscRows = $db->pselect("SELECT CenterID, Name FROM psc", array());
         foreach ($pscRows AS $row) {
             $this->centerIDMap[$row['CenterID']] = $row['Name'];
@@ -115,6 +117,8 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
                                'uploaded_by'   => 'v.uploaded_by',
                                'Date_uploaded' => 'v.Date_uploaded',
                               );
+
+        $this->_setFilterForm();
         return true;
     }
 
@@ -126,9 +130,9 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
     function _setFilterForm()
     {
         // create user object
-        $user =& User::singleton();
+        $user =& \User::singleton();
 
-        $list_of_sites = Utility::getSiteList(true, false);
+        $list_of_sites = \Utility::getSiteList(true, false);
            // allow to view all sites data through filter
         if ($user->hasPermission('access_all_profiles')) {
             // get the list of study sites - to be replaced by the Site object
@@ -137,26 +141,19 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
             }
         } else {
             // allow only to view own site data
-            $list_of_sites = array();
-            $site_arr      = $user->getData('CenterIDs');
-            foreach ($site_arr as $key => $val) {
-                $site[$key] = &Site::singleton($val);
-                if ($site[$key]->isStudySite()) {
-                    $list_of_sites[$val] = $site[$key]->getCenterName();
-                }
-                $list_of_sites = array('' => 'All User Sites') + $list_of_sites;
-            }
+            $list_of_sites = $user->getStudySites();
+            $list_of_sites = array('' => 'All User Sites') + $list_of_sites;
         }
 
-        $list_of_instruments = Utility::getAllInstruments();
+        $list_of_instruments = \Utility::getAllInstruments();
 
         $list_of_visit_labels = array_merge(
-            array(null => "Any") + Utility::getVisitList()
+            array(null => "Any") + \Utility::getVisitList()
         );
-        $subproject_options   = Utility::getSubprojectList();
+        $subproject_options   = \Utility::getSubprojectList();
         $subproject_options   = array(null => 'Any') + $subproject_options;
 
-        $DB = Database::singleton();
+        $DB = \Database::singleton();
 
         //There's no dropdown filter for file names?
         //$fileNames = $DB->pselect(
@@ -178,7 +175,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
         $this->addSelect('File_category', 'File category:', $fileCategories);
         $this->tpl_data['Sites']       = $list_of_sites;
         $this->tpl_data['Instruments'] = $list_of_instruments;
-        $user   =& User::singleton();
+        $user   =& \User::singleton();
         $userID = $user->getData('UserID');
         $this->tpl_data['User'] = $userID;
         $this->addSelect('For_site', 'For Site:', $list_of_sites);
@@ -186,6 +183,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
 
         return true;
     }
+
     /**
      * GetBetween function
      *
@@ -199,6 +197,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
         $string = explode($delim, $string);
         return isset($string[0]) ? $string[0] : '';
     }
+
     /**
      * WalkTree function
      *
@@ -213,6 +212,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
             $this->treeToArray[] = $item;
         }
     }
+
     /**
      * ParseTree function
      *
@@ -227,6 +227,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
         }
         return $this->treeToArray;
     }
+
     /**
      * ParseCategory function
      *
@@ -237,7 +238,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
     function parseCategory($value)
     {
         $depth = 0;
-        $DB    = Database::singleton();
+        $DB    = \Database::singleton();
             $categoryName = $value['category_name'];
         do {
             if ($value['parent_id'] != 0) {
@@ -260,7 +261,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
      */
     function _getPreparedQuery()
     {
-        $DB = Database::singleton();
+        $DB = \Database::singleton();
 
         $qparams = array();
         // add the base query
@@ -283,6 +284,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
                 'params' => $qparams,
                );
     }
+
     /**
      * Overwritten because the document repository isn't really a menu
      * filter table, it doesn't
@@ -303,7 +305,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
      */
     function _setDataTable()
     {
-        $DB       = Database::singleton();
+        $DB       = \Database::singleton();
         $results  = array();
         $query    = "SELECT * FROM document_repository_categories".
                     " ORDER BY parent_id ASC";
@@ -314,7 +316,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
             foreach ($results as $result) {
                 $thisref = &$refs->{$result['id']};
                 if (empty($thisref)) {
-                    $thisref = new stdClass();
+                    $thisref = new \stdClass();
                     $refs->{$result['id']} =& $thisref;
                 }
                 foreach ($result as $k => $v) {
@@ -357,10 +359,10 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
         $this->tpl_data['File_categories'] = $fileCategories;
 
         // create instance of config object
-        $config =& NDB_Config::singleton();
+        $config =& \NDB_Config::singleton();
 
         // overriding pagination
-        $DB = Database::singleton();
+        $DB = \Database::singleton();
 
         // print out column headings
         $i = 0;
@@ -382,6 +384,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
 
         $this->_setDataTableRows(-1);
     }
+
     /**
      * SetDataTableRows function
      *
@@ -391,15 +394,15 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
      */
     function _setDataTableRows($count)
     {
-        $DB       = Database::singleton();
+        $DB       = \Database::singleton();
         $query    = $this->_getPreparedQuery();
         $prepared = $DB->prepare($query['query']);
         $prepared->execute($query['params']);
 
-        $site_names = Utility::getSiteList(true);
+        $site_names = \Utility::getSiteList(true);
         // print out
         $x = 0;
-        while ($item = $prepared->fetch(PDO::FETCH_ASSOC)) {
+        while ($item = $prepared->fetch(\PDO::FETCH_ASSOC)) {
             $FileCategory
                 =& $this->tpl_data['File_categories'][$item['File_category']];
             $DisplayItem  = $item;
@@ -455,7 +458,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
      */
     function getCSSDependencies()
     {
-        $factory = NDB_Factory::singleton();
+        $factory = \NDB_Factory::singleton();
         $baseURL = $factory->settings()->getBaseURL();
         $deps    = parent::getCSSDependencies();
         return array_merge(
@@ -475,7 +478,7 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
      */
     function getJSDependencies()
     {
-        $factory = NDB_Factory::singleton();
+        $factory = \NDB_Factory::singleton();
         $baseURL = $factory->settings()->getBaseURL();
         $deps    = parent::getJSDependencies();
         return array_merge(
@@ -488,4 +491,3 @@ class NDB_Menu_Filter_Document_Repository extends NDB_Menu_Filter
 
 }
 
-?>

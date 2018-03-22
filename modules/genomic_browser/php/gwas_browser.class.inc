@@ -4,32 +4,29 @@
  * Displays GWAS analysis results
  * Filterable by SNP and p-value, and other fields.
  *
- * PHP version 5
+ * PHP version 7
  *
- *  @category   Genomic
- *  @package    Main
- *  @subpackage Genomic
- *  @author     Christine Rogers <rogers@bic.mni.mcgill.ca>
- *  @license    http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
- *  @link       https://www.github.com/aces/Loris/
- *  Submenu:    GWAS
+ *  @category LORIS_Module
+ *  @package  Genomics
+ *  @author   Christine Rogers <rogers@bic.mni.mcgill.ca>
+ *  @license  http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
+ *  @link     https://www.github.com/aces/Loris/
  */
+namespace LORIS\genomic_browser;
 
-require_once 'NDB_Menu_Filter.class.inc';
 /**
- * NDB_Menu_Filter_GWAS_Browser Class
+ * GWAS_Browser Class
  *
  * This class is gwas_browser Form
  * GWAS submenu tab for Genomic Browser
  *
- * @category   Genomic
- * @package    Main
- * @subpackage Genomic
- * @author     Christine Rogers <rogers@bic.mni.mcgill.ca>
- * @license    http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
- * @link       https://github.com/aces/Loris
+ * @category LORIS_Module
+ * @package  Genomics
+ * @author   Christine Rogers <rogers@bic.mni.mcgill.ca>
+ * @license  http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
+ * @link     https://github.com/aces/Loris
 */
-class NDB_Menu_Filter_GWAS_Browser extends NDB_Menu_Filter
+class GWAS_Browser extends \NDB_Menu_Filter
 {
     /**
      * Variables to enable special filter behaviour -
@@ -47,7 +44,7 @@ class NDB_Menu_Filter_GWAS_Browser extends NDB_Menu_Filter
     function _hasAccess()
     {
         // create user object
-        $user = User::singleton();
+        $user = \User::singleton();
         return ($user->hasPermission('genomic_browser_view_allsites')
                 || $user->hasPermission('genomic_browser_view_site'));
     }
@@ -63,8 +60,8 @@ class NDB_Menu_Filter_GWAS_Browser extends NDB_Menu_Filter
         // set the class variables
         $this->columns = array(
                           'GWAS.rsID AS SNP_ID',
-                          'genome_loc.Chromosome AS Chromosome',
-                          'genome_loc.StartLoc AS Position_BP',
+                          'SNP.Chromosome AS Chromosome',
+                          'SNP.StartLoc AS Position_BP',
                           'GWAS.MajorAllele AS Major_Allele',
                           'GWAS.MinorAllele AS Minor_Allele',
                           'GWAS.MAF AS MAF',
@@ -86,14 +83,13 @@ class NDB_Menu_Filter_GWAS_Browser extends NDB_Menu_Filter
 
         // $this->query = " FROM GWAS ";
         $this->query = " FROM GWAS
-            JOIN SNP ON (GWAS.SNPID = SNP.SNPID)
-            JOIN genome_loc ON (genome_loc.GenomeLocID = SNP.GenomeLocID)";
+            JOIN SNP ON (GWAS.SNPID = SNP.SNPID)";
 
-        $this->order_by     = 'genome_loc.Chromosome, GWAS.Pvalue DESC';
+        $this->order_by     = 'SNP.Chromosome, GWAS.Pvalue DESC';
         $this->validFilters = array(
                                'GWAS.rsID',
-                               'genome_loc.Chromosome',
-                               'genome_loc.StartLoc',
+                               'SNP.Chromosome',
+                               'SNP.StartLoc',
                                'GWAS.MajorAllele',
                                'GWAS.MinorAllele',
                                'GWAS.MAF',
@@ -104,8 +100,8 @@ class NDB_Menu_Filter_GWAS_Browser extends NDB_Menu_Filter
 
         $this->formToFilter = array(
                                'SNP_ID'       => 'GWAS.rsID',
-                               'Chromosome'   => 'genome_loc.Chromosome',
-                               'BP_Position'  => 'genome_loc.StartLoc',
+                               'Chromosome'   => 'SNP.Chromosome',
+                               'BP_Position'  => 'SNP.StartLoc',
                                'Major_Allele' => 'GWAS.MajorAllele',
                                'Minor_Allele' => 'GWAS.MinorAllele',
                                'MAF'          => 'GWAS.MAF',
@@ -118,15 +114,18 @@ class NDB_Menu_Filter_GWAS_Browser extends NDB_Menu_Filter
     }
 
     /**
-     * Sets the template data for the filter form
+     * Does the setup required for this page. By default, sets up elements
+     * that are common to every type of page. May be overridden by a specific
+     * page or specific page type.
      *
-     * @note   overloaded function
-     * @return bool
+     * @return none
      */
-    function _setFilterForm()
+    function setup()
     {
+        parent::setup();
+
         // create user object
-        $user = User::singleton();
+        $user = \User::singleton();
 
         // add form elements
         $show_results_options = array(
@@ -206,7 +205,7 @@ class NDB_Menu_Filter_GWAS_Browser extends NDB_Menu_Filter
      */
     function getJSDependencies()
     {
-        $factory = NDB_Factory::singleton();
+        $factory = \NDB_Factory::singleton();
         $baseURL = $factory->settings()->getBaseURL();
         $deps    = parent::getJSDependencies();
         return array_merge(

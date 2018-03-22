@@ -4,32 +4,29 @@
  * Displays SNP genomic variant data.
  * Filterable by candidate, gene or variant fields.
  *
- * PHP version 5
+ * PHP version 7
  *
- *  @category   Genomic
- *  @package    Main
- *  @subpackage Genomic
- *  @author     Christine Rogers <rogers@bic.mni.mcgill.ca>
- *  @license    http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
- *  @link       https://www.github.com/aces/Loris/
- *  Main page: genomic_browser. Submenu: SNP
+ *  @category LORIS_Module
+ *  @package  Genomics
+ *  @author   Christine Rogers <rogers@bic.mni.mcgill.ca>
+ *  @license  http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
+ *  @link     https://www.github.com/aces/Loris/
  */
+namespace LORIS\genomic_browser;
 
-require_once 'NDB_Menu_Filter.class.inc';
 /**
- * NDB_Menu_Filter_SNP_Browser Class
+ * SNP_Browser Class
  *
  * This class is snp_browser Form
  * SNP submenu tab for Genomic Browser
  *
- * @category   Genomic
- * @package    Main
- * @subpackage Genomic
- * @author     Christine Rogers <rogers@bic.mni.mcgill.ca>
- * @license    http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
- * @link       https://github.com/aces/Loris
+ * @category LORIS_Module
+ * @package  Genomics
+ * @author   Christine Rogers <rogers@bic.mni.mcgill.ca>
+ * @license  http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
+ * @link     https://github.com/aces/Loris
 */
-class NDB_Menu_Filter_SNP_Browser extends NDB_Menu_Filter
+class SNP_Browser extends \NDB_Menu_Filter
 {
     /**
      * Variables to enable special filter behaviour -
@@ -53,7 +50,7 @@ class NDB_Menu_Filter_SNP_Browser extends NDB_Menu_Filter
     function _hasAccess()
     {
         // create user object
-        $user = User::singleton();
+        $user = \User::singleton();
         return ($user->hasPermission('genomic_browser_view_allsites')
                 || $user->hasPermission('genomic_browser_view_site'));
     }
@@ -76,13 +73,12 @@ class NDB_Menu_Filter_SNP_Browser extends NDB_Menu_Filter
                           'cohort.SubprojectID as Subproject',
                           'DATE_FORMAT(candidate.DoB,\'%Y-%m-%d\') AS DoB',
                           'candidate.ExternalID as externalID',
-                          'genome_loc.Chromosome as Chromosome',
-                          'genome_loc.Strand as Strand',
-                          'genome_loc.StartLoc as StartLoc',
-                          'genome_loc.EndLoc as EndLoc',
-                          'genome_loc.Size as Size',
-                          'gene.OfficialSymbol as Gene_Symbol',
-                          'gene.OfficialName as Gene_Name',
+                          'SNP.Chromosome as Chromosome',
+                          'SNP.Strand as Strand',
+                          'SNP.StartLoc as StartLoc',
+                          'SNP.EndLoc as EndLoc',
+                          'SNP.OfficialSymbol as Gene_Symbol',
+                          'SNP.OfficialName as Gene_Name',
                           'genotyping_platform.Name as Platform',
                           'SNP.rsID as rsID',
                           'SNP.SNPExternalName as SNP_Name',
@@ -119,7 +115,6 @@ class NDB_Menu_Filter_SNP_Browser extends NDB_Menu_Filter
                  'Strand',
                  'StartLoc',
                  'EndLoc',
-                 'Size',
                  'Gene_Symbol',
                  'Gene_Name',
                  'Platform',
@@ -135,7 +130,6 @@ class NDB_Menu_Filter_SNP_Browser extends NDB_Menu_Filter
             )
         );
 
-        // Chromosome from genome_loc table
         // INNER JOIN on SNP_candidate_rel table. //##
         // If a candidate has no SNP records, they will not appear.
         $this->query = " FROM candidate
@@ -145,15 +139,13 @@ class NDB_Menu_Filter_SNP_Browser extends NDB_Menu_Filter
             LEFT JOIN psc ON (psc.CenterID = candidate.CenterID)
             JOIN SNP_candidate_rel ON (candidate.CandID = SNP_candidate_rel.CandID)
             LEFT JOIN SNP ON (SNP.SNPID = SNP_candidate_rel.SNPID)
-            LEFT JOIN genome_loc ON (genome_loc.GenomeLocID = SNP.GenomeLocID)
-            LEFT JOIN gene ON (gene.GenomeLocID = SNP.GenomeLocID)
             LEFT JOIN genotyping_platform ON
               (SNP_candidate_rel.PlatformID = genotyping_platform.PlatformID)
             WHERE
             candidate.Entity_type = 'Human' AND candidate.Active = 'Y' ";
 
-        $DB   = Database::singleton();
-        $user = User::singleton();
+        $DB   = \Database::singleton();
+        $user = \User::singleton();
         if (!$user->hasPermission('genomic_browser_view_allsites')) {
             // restrict data to own site
             $site_arr     = implode(",", $user->getCenterIDs());
@@ -189,13 +181,13 @@ class NDB_Menu_Filter_SNP_Browser extends NDB_Menu_Filter
                                'SNP.Damaging',
                                'SNP_candidate_rel.GenotypeQuality',
                                'SNP.ExonicFunction',
-                               'genome_loc.Chromosome',
-                               'genome_loc.Strand',
-                               'genome_loc.StartLoc',
-                               'genome_loc.EndLoc',
-                               'genome_loc.Strand',
-                               'gene.OfficialSymbol',
-                               'gene.OfficialName',
+                               'SNP.Chromosome',
+                               'SNP.Strand',
+                               'SNP.StartLoc',
+                               'SNP.EndLoc',
+                               'SNP.Strand',
+                               'SNP.OfficialSymbol',
+                               'SNP.OfficialName',
                                'genotyping_platform.Name',
                                'genomic_range',
                               );
@@ -225,8 +217,8 @@ class NDB_Menu_Filter_SNP_Browser extends NDB_Menu_Filter
                 'Damaging'            => 'SNP.Damaging',
                 'Genotype_Quality'    => 'SNP_candidate_rel.GenotypeQuality',
                 'Exonic_Function'     => 'SNP.ExonicFunction',
-                'Chromosome'          => 'genome_loc.Chromosome',
-                'Gene_Symbol'         => 'gene.OfficalSymbol',
+                'Chromosome'          => 'SNP.Chromosome',
+                'Gene_Symbol'         => 'SNP.OfficalSymbol',
                 'genomic_range'       => 'genomic_range',
                 'Platform'            => 'genotyping_platform.Name',
                );
@@ -237,39 +229,35 @@ class NDB_Menu_Filter_SNP_Browser extends NDB_Menu_Filter
     }
 
     /**
-     * Sets the template data for the filter form
+     * Does the setup required for this page. By default, sets up elements
+     * that are common to every type of page. May be overridden by a specific
+     * page or specific page type.
      *
-     * @note   overloaded function
-     * @return bool
+     * @return none
      */
-    function _setFilterForm()
+    function setup()
     {
+        parent::setup();
+
         // create user object
-        $user = User::singleton();
+        $user = \User::singleton();
 
         // PSC
         if ($user->hasPermission('genomic_browser_view_allsites')) {
             // has access to all sites genomic data
             // get the list of study sites - to be replaced by the Site object
-            $list_of_sites = Utility::getSiteList();
+            $list_of_sites = \Utility::getSiteList();
             if (is_array($list_of_sites)) {
                 $list_of_sites = array('' => 'Any') + $list_of_sites;
             }
         } else {
             // allow only to view own site data
-            $list_of_sites = array();
-            $site_arr      = $user->getData('CenterIDs');
-            foreach ($site_arr as $key => $val) {
-                $site[$key] = &Site::singleton($val);
-                if ($site[$key]->isStudySite()) {
-                    $list_of_sites[$val] = $site[$key]->getCenterName();
-                }
-                $list_of_sites = array('' => 'All User Sites') + $list_of_sites;
-            }
+            $list_of_sites = $user->getStudySites();
+            $list_of_sites = array('' => 'All User Sites') + $list_of_sites;
         }
 
         // SubprojectID
-        $list_of_subprojects = Utility::getSubprojectList();
+        $list_of_subprojects = \Utility::getSubprojectList();
 
         // add form elements
         $this->addSelect('centerID', 'Site:', $list_of_sites);
@@ -366,7 +354,7 @@ class NDB_Menu_Filter_SNP_Browser extends NDB_Menu_Filter
         $this->addBasicText('Gene_Symbol', 'Gene:');
         $this->addBasicText('Gene_Name', 'Name:');
 
-        $DB = Database::singleton();
+        $DB = \Database::singleton();
         $platform_results
             = $DB->pselect(
                 "SELECT distinct Name FROM genotyping_platform ",
@@ -431,17 +419,18 @@ class NDB_Menu_Filter_SNP_Browser extends NDB_Menu_Filter
                 $query .= " AND $field = CONVERT( :v_$prepared_key, DECIMAL) ";
             } elseif ($field == "genomic_range") {
                 $temp_array = explode(':', $val);
-                $chr        = $GLOBALS['DB']->quote($temp_array[0]);
-                $chrchr     = $GLOBALS['DB']->quote('chr'.$temp_array[0]);
 
-                $query .= " AND (genome_loc.Chromosome = $chr";
-                $query .= " OR genome_loc.Chromosome = $chrchr) ";
+                $chr    = $GLOBALS['DB']->quote($temp_array[0]);
+                $chrchr = $GLOBALS['DB']->quote('chr'.$temp_array[0]);
+
+                $query .= " AND (SNP.Chromosome = $chr";
+                $query .= " OR SNP.Chromosome = $chrchr) ";
                 if (!empty($temp_array[1]) AND strpos($temp_array[1], '-') ) {
                     $temp_array = explode('-', $temp_array[1]);
                     $from       = $temp_array[0];
                     $to         = $temp_array[1];
-                    $query     .= " AND genome_loc.StartLoc <= $to";
-                    $query     .= " AND genome_loc.EndLoc >= $from";
+                    $query     .= " AND SNP.StartLoc <= $to";
+                    $query     .= " AND SNP.EndLoc >= $from";
                 }
                 $query .= " AND :v_$prepared_key IS NOT NULL";
 
@@ -460,7 +449,7 @@ class NDB_Menu_Filter_SNP_Browser extends NDB_Menu_Filter
      */
     function getJSDependencies()
     {
-        $factory = NDB_Factory::singleton();
+        $factory = \NDB_Factory::singleton();
         $baseURL = $factory->settings()->getBaseURL();
         $deps    = parent::getJSDependencies();
         return array_merge(
