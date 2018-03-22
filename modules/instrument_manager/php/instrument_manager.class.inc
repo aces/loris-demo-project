@@ -89,7 +89,10 @@ class Instrument_Manager extends \NDB_Menu_Filter
                 $sqlSelectOne,
                 array('testname' => $_FILES['install_file']['name'])
             );
+            //############################ DEMO ############################
+//            if ($exists <= 0) {
             if (false) {
+            //############################ DEMO ############################
                 $db_config = $config->getSetting('database');
                 exec("php generate_tables_sql_and_testNames.php < $new_file");
 

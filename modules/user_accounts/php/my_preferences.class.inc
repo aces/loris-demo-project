@@ -436,7 +436,6 @@ class My_Preferences extends \NDB_Form
 
         // if password is user-defined, and user wants to change password
         if (!empty($values['Password_hash'])) {
-
             // check password strength
             $isPasswordStrong = \User::isPasswordStrong(
                 $values['Password_hash'],
