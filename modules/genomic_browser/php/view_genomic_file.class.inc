@@ -1,35 +1,30 @@
 <?php
-
 /**
  * Form_genomic_browser class file
  *
- * PHP version 5
+ * PHP version 7
  *
- * @category   Genomic
- * @package    Main
- * @subpackage Genomic
- * @author     Christine Rogers <rogers@bic.mni.mcgill.ca>
- * @license    http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
- * @link       https://github.com/aces/Loris
+ * @category LORIS_Module
+ * @package  Genomics
+ * @author   Christine Rogers <rogers@bic.mni.mcgill.ca>
+ * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
+ * @link     https://github.com/aces/Loris
 */
+namespace LORIS\genomic_browser;
 
-require_once "NDB_BVL_Battery.class.inc";
-require_once 'NDB_Form.class.inc';
-require_once 'GenomicFile.class.inc';
 /**
- * NDB_Form_Genomic_Browser Class
+ * Vie_Genomic_File Class
  *
- * This class is genomic_browser Form
+ * This class is a Form to present Genomic_file data
  *
- * @category   Genomic
- * @package    Main
- * @subpackage Genomic
- * @author     Christine Rogers <rogers@bic.mni.mcgill.ca>
- * @license    http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
- * @link       https://github.com/aces/Loris
+ * @category LORIS_Module
+ * @package  Genomics
+ * @author   Christine Rogers <rogers@bic.mni.mcgill.ca>
+ * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
+ * @link     https://github.com/aces/Loris
 */
 
-class NDB_Form_Genomic_Browser extends NDB_Form
+class View_Genomic_File extends \NDB_Form
 {
     /**
      * Variables to store the DCCID, genomic file ID
@@ -44,7 +39,7 @@ class NDB_Form_Genomic_Browser extends NDB_Form
     */
     function _hasAccess()
     {
-        $user =& User::singleton();
+        $user =& \User::singleton();
 
         // Add site control? See Imaging Browser example
         return ($user->hasPermission('genomic_browser_view_allsites') ||
@@ -52,14 +47,17 @@ class NDB_Form_Genomic_Browser extends NDB_Form
     }
 
     /**
-    * Sets up main parameters given one GenomicFileID
-    * Visit Label or SessionID not required
-    *
-    * @return NULL
-    */
-    function viewGenomicFile()
+     * Does the setup required for this page. By default, sets up elements
+     * that are common to every type of page. May be overridden by a specific
+     * page or specific page type.
+     *
+     * @return none
+     */
+    function setup()
     {
-        $this->DB = Database::singleton();
+        parent::setup();
+
+        $this->DB = \Database::singleton();
 
         $this->genomic_file_id = $_REQUEST['GenomicFileID'];
         $this->candID          = $_REQUEST['candID'];
@@ -92,7 +90,7 @@ class NDB_Form_Genomic_Browser extends NDB_Form
         }
         $this->tpl_data['files'] = array();
         foreach ($files as $fileRow) {
-            $FileObj = new GenomicFile($fileRow['GenomicFileID']);
+            $FileObj = new Genomic_File($fileRow['GenomicFileID']);
 
             // Get a few parameters
             $paramFilename         = basename($FileObj->getParameter('FileName'));

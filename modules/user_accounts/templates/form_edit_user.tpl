@@ -86,7 +86,6 @@
      </div>
      <!-- </div> -->
      <br>
-{*
      {if $form.errors.Password_Group}
      <div class="row form-group form-inline form-inline has-error">
         {else}
@@ -112,7 +111,6 @@
     		{$form.__Confirm.html}
     	</div>
     </div>
-*}
     <!-- <div class="row form-group form-inline">
     	<label class="col-sm-2">
     		{$form.Real_name.label}

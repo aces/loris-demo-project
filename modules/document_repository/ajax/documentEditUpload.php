@@ -79,8 +79,7 @@ if ($userSingleton->hasPermission('document_repository_view')
 
         $target_path = $base_path  . $fileBase;
 
-        if (unlink($_FILES["file"]["tmp_name"])) {
-            echo "The Demo server does not accept file uploads. The database has been updated however to maintain the illusion.";
+        if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_path)) {
             $success = $DB->insert(
                 'document_repository',
                 array(

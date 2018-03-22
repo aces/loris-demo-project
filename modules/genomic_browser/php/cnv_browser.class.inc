@@ -4,30 +4,29 @@
  * Displays CNV (Copy Number Variant) genomic data
  * Filterable by candidate, gene or variant fields.
  *
- * PHP version 5
+ * PHP version 7
  *
- *  @category   Genomic
- *  @package    Main
- *  @subpackage Genomic
- *  @author     Christine Rogers <rogers@bic.mni.mcgill.ca>
- *  @license    http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
- *  @link       https://www.github.com/aces/Loris/
+ *  @category LORIS_Module
+ *  @package  Genomics
+ *  @author   Christine Rogers <rogers@bic.mni.mcgill.ca>
+ *  @license  http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
+ *  @link     https://www.github.com/aces/Loris/
  *  Subtab: CNV
  */
+namespace LORIS\genomic_browser;
 
-require_once 'NDB_Menu_Filter.class.inc';
 /**
- * NDB_Menu_Filter_CNV_Browser Class
+ * CNV_Browser Class
  *
  * This class is cnv_browser Form
  *
- * @category Genomic
- * @package  Genomic
+ * @category LORIS_Module
+ * @package  Genomics
  * @author   Christine Rogers <rogers@bic.mni.mcgill.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt @GPLv3
  * @link     https://github.com/aces/Loris
 */
-class NDB_Menu_Filter_CNV_Browser extends NDB_Menu_Filter
+class CNV_Browser extends \NDB_Menu_Filter
 {
     /**
      * Variables to enable special filter behaviour -
@@ -51,7 +50,7 @@ class NDB_Menu_Filter_CNV_Browser extends NDB_Menu_Filter
     function _hasAccess()
     {
         // create user object
-        $user = User::singleton();
+        $user = \User::singleton();
         return ($user->hasPermission('genomic_browser_view_allsites')
                 || $user->hasPermission('genomic_browser_view_site'));
     }
@@ -73,20 +72,19 @@ class NDB_Menu_Filter_CNV_Browser extends NDB_Menu_Filter
                           'cohort.SubprojectID as Subproject',
                           'DATE_FORMAT(candidate.DoB,\'%Y-%m-%d\') AS DoB',
                           'candidate.ExternalID as ExternalID',
-                          'genome_loc.Chromosome as Chromosome',
-                          'genome_loc.Strand as Strand',
-                          'genome_loc.StartLoc as StartLoc',
-                          'genome_loc.EndLoc as EndLoc',
-                          'genome_loc.Size as Size',
+                          'CNV.Chromosome as Chromosome',
+                          'CNV.Strand as Strand',
+                          'CNV.StartLoc as StartLoc',
+                          'CNV.EndLoc as EndLoc',
                           'CONCAT(
-                              genome_loc.Chromosome, 
+                              CNV.Chromosome, 
                               ":",
-                              genome_loc.StartLoc,
+                              CNV.StartLoc,
                               "-",
-                              genome_loc.EndLoc
+                              CNV.EndLoc
                            ) as Location',
-                          'gene.OfficialSymbol as Gene_Symbol',
-                          'gene.OfficialName as Gene_Name',
+                          'CNV.OfficialSymbol as Gene_Symbol',
+                          'CNV.OfficialName as Gene_Name',
                           'CNV.Description as CNV_Description',
                           'CNV.Type as CNV_Type',
                           'CNV.CopyNumChange as Copy_Num_Change',
@@ -117,7 +115,6 @@ class NDB_Menu_Filter_CNV_Browser extends NDB_Menu_Filter
                  'Strand',
                  'StartLoc',
                  'EndLoc',
-                 'Size',
                  'Event_Name',
                  'Gene_Symbol',
                  'Gene_Name',
@@ -135,15 +132,13 @@ class NDB_Menu_Filter_CNV_Browser extends NDB_Menu_Filter
                 ON (cohort.CandID=candidate.CandID)
             LEFT JOIN psc ON (psc.CenterID=candidate.CenterID)
             JOIN CNV ON (candidate.CandID = CNV.CandID)
-            LEFT JOIN genome_loc ON (genome_loc.GenomeLocID = CNV.GenomeLocID)
-            LEFT JOIN gene ON (gene.GenomeLocID = CNV.GenomeLocID)
             LEFT JOIN genotyping_platform ON
               (CNV.PlatformID = genotyping_platform.PlatformID)
             WHERE
             candidate.Entity_type = 'Human' AND candidate.Active = 'Y' ";
 
-        $DB   = Database::singleton();
-        $user = User::singleton();
+        $DB   = \Database::singleton();
+        $user = \User::singleton();
         if (!$user->hasPermission('genomic_browser_view_allsites')) {
             $site_arr     = implode(",", $user->getCenterIDs());
             $this->query .= " AND candidate.CenterID IN (" . $site_arr . ")";
@@ -172,11 +167,11 @@ class NDB_Menu_Filter_CNV_Browser extends NDB_Menu_Filter
                                'CNV.ArrayReport',
                                'CNV.Markers',
                                'CNV.ValidationMethod',
-                               'genome_loc.Chromosome',
-                               'genome_loc.Strand',
+                               'CNV.Chromosome',
+                               'CNV.Strand',
                                'genomic_range',
-                               'gene.OfficialSymbol',
-                               'gene.OfficialName',
+                               'CNV.OfficialSymbol',
+                               'CNV.OfficialName',
                                'genotyping_platform.Name',
                               );
 
@@ -198,11 +193,11 @@ class NDB_Menu_Filter_CNV_Browser extends NDB_Menu_Filter
                                'Array_Report'       => 'CNV.ArrayReport',
                                'Markers'            => 'CNV.Markers',
                                'Validation_Method'  => 'CNV.ValidationMethod',
-                               'Chromosome'         => 'genome_loc.Chromosome',
-                               'Strand'             => 'genome_loc.Strand',
+                               'Chromosome'         => 'CNV.Chromosome',
+                               'Strand'             => 'CNV.Strand',
                                'genomic_range'      => 'genomic_range',
-                               'Gene_Symbol'        => 'gene.OfficialSymbol',
-                               'Gene_Name'          => 'gene.OfficialName',
+                               'Gene_Symbol'        => 'CNV.OfficialSymbol',
+                               'Gene_Name'          => 'CNV.OfficialName',
                                'Platform'           => 'genotyping_platform.Name',
                               );
 
@@ -210,39 +205,35 @@ class NDB_Menu_Filter_CNV_Browser extends NDB_Menu_Filter
     }
 
     /**
-     * Sets the template data for the filter form
+     * Does the setup required for this page. By default, sets up elements
+     * that are common to every type of page. May be overridden by a specific
+     * page or specific page type.
      *
-     * @note   overloaded function
-     * @return bool
+     * @return none
      */
-    function _setFilterForm()
+    function setup()
     {
+        parent::setup();
+
         // create user object
-        $user = User::singleton();
+        $user = \User::singleton();
 
         // PSC
         if ($user->hasPermission('genomic_browser_view_allsites')) {
             // has access to all sites genomic data
             // get the list of study sites - to be replaced by the Site object
-            $list_of_sites = Utility::getSiteList();
+            $list_of_sites = \Utility::getSiteList();
             if (is_array($list_of_sites)) {
                 $list_of_sites = array('' => 'Any') + $list_of_sites;
             }
         } else {
             // allow only to view own site data
-            $list_of_sites = array();
-            $site_arr      = $user->getData('CenterIDs');
-            foreach ($site_arr as $key => $val) {
-                $site[$key] = &Site::singleton($val);
-                if ($site[$key]->isStudySite()) {
-                    $list_of_sites[$val] = $site[$key]->getCenterName();
-                }
-                $list_of_sites = array('' => 'All User Sites') + $list_of_sites;
-            }
+            $list_of_sites = $user->getStudySites();
+            $list_of_sites = array('' => 'All User Sites') + $list_of_sites;
         }
 
         // SubprojectID
-        $list_of_subprojects = Utility::getSubprojectList();
+        $list_of_subprojects = \Utility::getSubprojectList();
 
         // add form elements
         $this->addSelect('centerID', 'Site:', $list_of_sites);
@@ -330,9 +321,10 @@ class NDB_Menu_Filter_CNV_Browser extends NDB_Menu_Filter
         $this->addBasicText('genomic_range', 'Genomic Range:');
         $this->addBasicText('Gene_Symbol', 'Gene:');
 
-        $DB = Database::singleton();
-        $platform_results = $DB->select(
-            "SELECT distinct Name FROM genotyping_platform"
+        $DB = \Database::singleton();
+        $platform_results = $DB->pselect(
+            "SELECT distinct Name FROM genotyping_platform",
+            array()
         );
 
         $platform_options = array('' => 'Any');
@@ -394,15 +386,15 @@ class NDB_Menu_Filter_CNV_Browser extends NDB_Menu_Filter
                 $chr        = $GLOBALS['DB']->quote($temp_array[0]);
                 $chrchr     = $GLOBALS['DB']->quote('chr'.$temp_array[0]);
 
-                $query .= " AND (genome_loc.Chromosome = $chr";
-                $query .= " OR genome_loc.Chromosome = $chrchr)";
+                $query .= " AND (CNV.Chromosome = $chr";
+                $query .= " OR CNV.Chromosome = $chrchr)";
 
                 if (!empty($temp_array[1]) AND strpos($temp_array[1], '-') ) {
                     $temp_array = explode('-', $temp_array[1]);
                     $from       = $temp_array[0];
                     $to         = $temp_array[1];
-                    $query     .= " AND genome_loc.StartLoc < $to";
-                    $query     .= " AND genome_loc.EndLoc > $from";
+                    $query     .= " AND CNV.StartLoc < $to";
+                    $query     .= " AND CNV.EndLoc > $from";
                 }
                 $query .= " AND :v_$prepared_key IS NOT NULL";
 
@@ -421,7 +413,7 @@ class NDB_Menu_Filter_CNV_Browser extends NDB_Menu_Filter
      */
     function getJSDependencies()
     {
-        $factory = NDB_Factory::singleton();
+        $factory = \NDB_Factory::singleton();
         $baseURL = $factory->settings()->getBaseURL();
         $deps    = parent::getJSDependencies();
         return array_merge(

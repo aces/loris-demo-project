@@ -157,8 +157,7 @@ function uploadFile()
               'date_uploaded' => date("Y-m-d H:i:s"),
              ];
 
-    if (unlink($_FILES["file"]["tmp_name"])) {
-
+    if (move_uploaded_file($_FILES["file"]["tmp_name"], $mediaPath . $fileName)) {
         $existingFiles = getFilesList();
         $idMediaFile   = array_search($fileName, $existingFiles);
         try {
@@ -168,10 +167,7 @@ function uploadFile()
             } else {
                 $db->insert('media', $query);
             }
-            showError(
-                "The Demo server does not accept file uploads. 
-                The database has been updated however to maintain the illusion."
-            );
+            $uploadNotifier->notify(array("file" => $fileName));
         } catch (DatabaseException $e) {
             showError("Could not upload the file. Please try again!");
         }
