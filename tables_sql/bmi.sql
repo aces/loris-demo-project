@@ -1,9 +1,13 @@
 CREATE TABLE `bmi` (
 `CommentID` varchar(255) NOT NULL default '',
-                          `UserID` varchar(255) default NULL,
-                          `Examiner` varchar(255) default NULL,
-                          `Testdate` timestamp NOT NULL,
-                          `Data_entry_completion_status` enum('Incomplete','Complete') NOT NULL default 'Incomplete',
+
+                            `UserID` varchar(255) default NULL,
+
+                            `Examiner` varchar(255) default NULL,
+
+                            `Testdate` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+                            `Data_entry_completion_status` enum('Incomplete','Complete') NOT NULL default 'Incomplete',
 `Date_taken` date default NULL,
 `Candidate_Age` varchar(255) default NULL,
 `Window_Difference` varchar(255) default NULL,
@@ -21,5 +25,5 @@ CREATE TABLE `bmi` (
 `bmi` varchar(255) default NULL,
 `bmi_category` varchar(255) default NULL,
 PRIMARY KEY  (`CommentID`)
-);
-REPLACE INTO test_names (Test_name, Full_name, Sub_group) VALUES ('bmi', 'BMI Calculator', 1);
+
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
