@@ -36,7 +36,7 @@ class NDB_BVL_Instrument_medical_history extends NDB_BVL_Instrument
      * @return void
      * @access public
      */
-    function setup($commentID, $page)
+    function setup($commentID = null, $page = null)
     {
         $this->formType ='XIN';
         $this->form     = new LorisForm('test_form');
@@ -278,21 +278,21 @@ class NDB_BVL_Instrument_medical_history extends NDB_BVL_Instrument
 
         // Concussion table headers
 
-        $group[] =& $this->form->createElement(
+        $group[] = $this->form->createElement(
             "static",
             null,
             null,
             "Incident"
         );
 
-        $group[] =& $this->form->createElement(
+        $group[] = $this->form->createElement(
             "static",
             null,
             null,
             "Hospitalized?"
         );
 
-        $group[] =& $this->form->createElement(
+        $group[] = $this->form->createElement(
             "static",
             null,
             null,
@@ -311,7 +311,7 @@ class NDB_BVL_Instrument_medical_history extends NDB_BVL_Instrument
 
         for ($i = 1; $i < 4; $i++) {
 
-            $group[] =& $this->createText(
+            $group[] = $this->createText(
                 "concussion_" . $i . "_description",
                 "Incident"
             );
@@ -322,7 +322,7 @@ class NDB_BVL_Instrument_medical_history extends NDB_BVL_Instrument
                 "Required."
             );
 
-            $group[] =& $this->createSelect(
+            $group[] = $this->createSelect(
                 "concussion_" . $i . "_hospitalized",
                 "Hospitalized?",
                 $yesNoOptions
@@ -334,7 +334,7 @@ class NDB_BVL_Instrument_medical_history extends NDB_BVL_Instrument
                 "Required."
             );
 
-            $group[] =& $this->createText(
+            $group[] = $this->createText(
                 "concussion_" . $i . "_age",
                 "Age"
             );

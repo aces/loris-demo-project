@@ -5,7 +5,7 @@ CREATE TABLE `radiology_review` (
 
                             `Examiner` varchar(255) default NULL,
 
-                            `Testdate` timestamp NOT NULL,
+                            `Testdate` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
                             `Data_entry_completion_status` enum('Incomplete','Complete') NOT NULL default 'Incomplete',
 `Date_taken` date default NULL,
@@ -22,4 +22,4 @@ CREATE TABLE `radiology_review` (
 `Incidental_findings_status` enum('not_answered') default NULL,
 PRIMARY KEY  (`CommentID`)
 
-              );
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
