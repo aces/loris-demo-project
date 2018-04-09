@@ -32,29 +32,37 @@ $DB =& Database::singleton();
 foreach ($_POST as $key => $value) {
     if (is_numeric($key)) { //update
         if ($value == "") {
-            $DB->delete('Config', array('ID' => $key));
+            //############################ DEMO ############################
+//            $DB->delete('Config', array('ID' => $key));
+            //############################ DEMO ############################
         } else {
-            $DB->update(
-                'Config',
-                array('Value' => $value),
-                array('ID' => $key)
-            );
+            //############################ DEMO ############################
+//            $DB->update(
+//                'Config',
+//                array('Value' => $value),
+//                array('ID' => $key)
+//            );
+            //############################ DEMO ############################
         }
     } else { //add new or remove
         $keySplit   = explode("-", $key);
         $valueSplit = explode("-", $value);
         if ($keySplit[0] == 'add') {
             if ($value !== "") {
-                $DB->insert(
-                    'Config',
-                    array(
-                     'ConfigID' => $keySplit[1],
-                     'Value'    => $value,
-                    )
-                );
+                //############################ DEMO ############################
+//                $DB->insert(
+//                    'Config',
+//                    array(
+//                     'ConfigID' => $keySplit[1],
+//                     'Value'    => $value,
+//                    )
+//                );
+                //############################ DEMO ############################
             }
         } elseif ($valueSplit[0] == 'remove') {
-            $DB->delete('Config', array('ID' => $valueSplit[1]));
+            //############################ DEMO ############################
+//            $DB->delete('Config', array('ID' => $valueSplit[1]));
+            //############################ DEMO ############################
         }
     }
 }

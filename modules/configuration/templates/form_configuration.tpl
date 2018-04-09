@@ -116,7 +116,9 @@
     {/foreach}
     </div>
 {/function}
-
+{*############################ DEMO ############################*}
+<p style="color: red"><b><i>**Demonstration Notice: In order to avoid corrupting the demonstration server, no changes <br>implemented on this form will be saved to the database.**</p>
+{*############################ DEMO ############################*}
 <p>Please enter the various configuration variables into the fields below. For information on how to configure LORIS, please refer to the Help section and/or the Developer's guide.</p>
 <p>To configure study subprojects <a href="{$baseurl}/configuration/subproject/">click here</a>.
 {if $useProjects == 'true'}

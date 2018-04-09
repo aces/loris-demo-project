@@ -77,16 +77,22 @@ class Instrument_Manager extends \NDB_Menu_Filter
 
             $new_file = $this->path . "project/instruments/" .
                         $_FILES['install_file']['name'];
-            move_uploaded_file($_FILES['install_file']['tmp_name'], $new_file);
-            chmod($new_file, 0644);
-            chdir($this->path . "/tools");
+            //############################ DEMO ############################
+            unlink($_FILES['install_file']['tmp_name']);
+//            chmod($new_file, 0644);
+//            chdir($this->path . "/tools");
+            //############################ DEMO ############################
+
             $sqlSelectOne = "SELECT count(*)".
                             " FROM test_names WHERE Test_name=:testname";
             $exists       = $db->pselectOne(
                 $sqlSelectOne,
                 array('testname' => $_FILES['install_file']['name'])
             );
-            if ($exists <= 0) {
+            //############################ DEMO ############################
+//            if ($exists <= 0) {
+            if (false) {
+            //############################ DEMO ############################
                 $db_config = $config->getSetting('database');
                 exec("php generate_tables_sql_and_testNames.php < $new_file");
 
