@@ -32,37 +32,29 @@ $DB =& Database::singleton();
 foreach ($_POST as $key => $value) {
     if (is_numeric($key)) { //update
         if ($value == "") {
-            //############################ DEMO ############################
-//            $DB->delete('Config', array('ID' => $key));
-            //############################ DEMO ############################
+            $DB->delete('Config', array('ID' => $key));
         } else {
-            //############################ DEMO ############################
-//            $DB->update(
-//                'Config',
-//                array('Value' => $value),
-//                array('ID' => $key)
-//            );
-            //############################ DEMO ############################
+            $DB->update(
+                'Config',
+                array('Value' => $value),
+                array('ID' => $key)
+            );
         }
     } else { //add new or remove
         $keySplit   = explode("-", $key);
         $valueSplit = explode("-", $value);
         if ($keySplit[0] == 'add') {
             if ($value !== "") {
-                //############################ DEMO ############################
-//                $DB->insert(
-//                    'Config',
-//                    array(
-//                     'ConfigID' => $keySplit[1],
-//                     'Value'    => $value,
-//                    )
-//                );
-                //############################ DEMO ############################
+                $DB->insert(
+                    'Config',
+                    array(
+                     'ConfigID' => $keySplit[1],
+                     'Value'    => $value,
+                    )
+                );
             }
         } elseif ($valueSplit[0] == 'remove') {
-            //############################ DEMO ############################
-//            $DB->delete('Config', array('ID' => $valueSplit[1]));
-            //############################ DEMO ############################
+            $DB->delete('Config', array('ID' => $valueSplit[1]));
         }
     }
 }

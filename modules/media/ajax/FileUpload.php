@@ -106,6 +106,7 @@ function uploadFile()
     $site       = isset($_POST['forSite']) ? $_POST['forSite'] : null;
     $dateTaken  = isset($_POST['dateTaken']) ? $_POST['dateTaken'] : null;
     $comments   = isset($_POST['comments']) ? $_POST['comments'] : null;
+    $language   = isset($_POST['language']) ? $_POST['language'] : null;
 
     // If required fields are not set, show an error
     if (!isset($_FILES) || !isset($pscid) || !isset($visit) || !isset($site)) {
@@ -155,10 +156,10 @@ function uploadFile()
               'uploaded_by'   => $userID,
               'hide_file'     => 0,
               'date_uploaded' => date("Y-m-d H:i:s"),
+              'language_id'   => $language,
              ];
-    //############################ DEMO ############################
-    if (unlink($_FILES["file"]["tmp_name"])) {
-    //############################ DEMO ############################
+
+    if (move_uploaded_file($_FILES["file"]["tmp_name"], $mediaPath . $fileName)) {
         $existingFiles = getFilesList();
         $idMediaFile   = array_search($fileName, $existingFiles);
         try {
@@ -168,13 +169,7 @@ function uploadFile()
             } else {
                 $db->insert('media', $query);
             }
-            //############################ DEMO ############################\
-            showError(
-                "The Demo server does not accept file uploads. 
-                The database has been updated however to maintain the illusion."
-            );
-            //############################ DEMO ############################
-
+            $uploadNotifier->notify(array("file" => $fileName));
         } catch (DatabaseException $e) {
             showError("Could not upload the file. Please try again!");
         }
@@ -208,6 +203,7 @@ function getUploadFields()
     $candIdList      = toSelect($candidates, "CandID", "PSCID");
     $visitList       = Utility::getVisitList();
     $siteList        = Utility::getSiteList(false);
+    $languageList    = Utility::getLanguageList();
 
     // Build array of session data to be used in upload media dropdowns
     $sessionData    = [];
@@ -298,6 +294,7 @@ function getUploadFields()
             "comments, " .
             "file_name as fileName, " .
             "hide_file as hideFile, " .
+            "language_id as language" .
             "m.id FROM media m LEFT JOIN session s ON m.session_id = s.ID " .
             "WHERE m.id = $idMediaFile",
             []
@@ -313,6 +310,7 @@ function getUploadFields()
                'mediaData'   => $mediaData,
                'mediaFiles'  => array_values(getFilesList()),
                'sessionData' => $sessionData,
+               'language'    => $languageList,
               ];
 
     return $result;
