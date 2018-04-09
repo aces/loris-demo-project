@@ -1,4 +1,4 @@
-INSERT INTO test_names (Test_name, Full_name, Sub_group, IsDirectEntry) VALUES('mri_parameter_form', 'MRI Parameter Form', 2, NULL);
+INSERT INTO test_names (Test_name, Full_name, Sub_group) VALUES('mri_parameter_form', 'MRI Parameter Form', 2);
 
 
 INSERT INTO instrument_subtests (Test_name, Subtest_name, Description, Order_number) VALUES ('mri_parameter_form', 'mri_parameter_form_page1', 'Page 1', 1);
