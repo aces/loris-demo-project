@@ -18,8 +18,6 @@
     <!-- MINC TOOLS PATH -->
     <MINCToolsPath>/opt/minc/</MINCToolsPath>
 
-    <CouchDB>
-    </CouchDB>
 
     <!-- study variables -->
     <study>
