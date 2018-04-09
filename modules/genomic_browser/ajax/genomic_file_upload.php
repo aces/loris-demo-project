@@ -185,13 +185,11 @@ function moveFileToFS(&$fileToUpload)
                 "$dest_dir is not writable by web user."
             );
         }
-        //############################ DEMO ############################
-        if (unlink(
-            $fileToUpload->tmp_name
+        if (move_uploaded_file(
+            $fileToUpload->tmp_name,
+            $fileToUpload->full_path
         )) {
-            reportProgress(99, "The Demo server does not accept file uploads. The 
-            database has been updated however to maintain the illusion.");
-        //############################ DEMO ############################
+            reportProgress(99, "File successfully copied!");
         }
     } catch (Exception $ex){
         error_log("Cannot move file: $ex");
