@@ -19,10 +19,10 @@
         </form>
     </div>
 </div>
-{else}
+{/if}
+{if isset($feedback)}
 <div class="alert alert-warning">
-Instrument directory or tables_sql not writable.
-Automatic uploading of instruments has been disabled.
+{$feedback}
 </div>
 {/if}
 

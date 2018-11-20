@@ -210,7 +210,10 @@ class Imaging_Uploader extends \NDB_Menu_Filter_Form
         //set the the IDs to the handler functions.
         $file->setHandlerArgs(array("values" => $values));
         //proccesses them (including verify, move, and import steps)
-        $file->processFiles();
+        //############################ DEMO ############################
+        //$file->processFiles();
+        //############################ DEMO ############################
+
         return true;
     }
     /**
