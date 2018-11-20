@@ -123,24 +123,6 @@
         <!--This permission allows users from sites to have access to other sites bvl feedback info -->
         <multiSiteEnabledCenters>0</multiSiteEnabledCenters>
 
-        <!-- Consent module allows addition of consent information in the candidate information page-->
-         <ConsentModule>
-            <useConsent>true</useConsent>
-            <Consent>
-                <name>study_consent</name>
-                <label>Consent to Study</label>
-            </Consent>
-             <Consent>
-                 <name>raisin_consent</name>
-                 <label>Consent to Raisin</label>
-             </Consent>
-             <Consent>
-                 <name>bread_consent</name>
-                 <label>Consent to Bread</label>
-             </Consent>
-
-        </ConsentModule>
-
     </study>
     <!-- end of study definition -->
 
