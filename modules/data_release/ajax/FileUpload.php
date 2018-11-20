@@ -21,51 +21,64 @@ if ($_POST['action'] == 'upload') {
     $upload_date = date('Y-m-d');
     $base_path   = __DIR__ . "/../user_uploads/";
 
-    $target_path = $base_path . $fileName;
-    //############################ DEMO ############################
-    if (unlink($_FILES["file"]["tmp_name"])) {
-        echo "The Demo server does not accept file uploads. The database has been 
-        updated however to maintain the illusion.";
-    //############################ DEMO ############################
-        $success = $DB->insert(
-            'data_release',
-            array(
-             'file_name'   => $fileName,
-             'version'     => $version,
-             'upload_date' => $upload_date,
-            )
-        );
-
-        $user_ID = $DB->pselectOne(
-            "SELECT ID FROM users WHERE userid=:UserID",
-            array('UserID' => $user->getUsername())
-        );
-        $ID      = $DB->pselectOne(
-            "SELECT id FROM data_release WHERE "
-            . "file_name=:file_name AND "
-            . "version=:version AND "
-            . "upload_date=:upload_date",
-            array(
-             'file_name'   => $fileName,
-             'version'     => $version,
-             'upload_date' => $upload_date,
-            )
-        );
-        $success = $DB->insert(
-            'data_release_permissions',
-            array(
-             'userid'          => $user_ID,
-             'data_release_id' => $ID,
-            )
-        );
-    }
-
     $factory  = NDB_Factory::singleton();
     $settings = $factory->settings();
 
     $baseURL = $settings->getBaseURL();
 
-    header("Location: {$baseURL}/data_release/?uploadSuccess=true");
+    if (!file_exists(__DIR__ . "/../user_uploads/")) {
+        error_log(
+            "ERROR: File upload failed. Default user_uploads"
+            . " directory not found."
+        );
+        header("HTTP/1.1 500 Internal Server Error");
+    } elseif (!is_writable(__DIR__ . "/../user_uploads/")) {
+        error_log(
+            "File upload failed. Default user_uploads directory"
+            . " does not appear to be writeable."
+        );
+        header("HTTP/1.1 500 Internal Server Error");
+    } else {
+        $target_path = $base_path . $fileName;
+        //############################ DEMO ############################
+        if (unlink($_FILES["file"]["tmp_name"])) {
+            echo "The Demo server does not accept file uploads. The database has been 
+        updated however to maintain the illusion.";
+            //############################ DEMO ############################
+            $success = $DB->insert(
+                'data_release',
+                array(
+                 'file_name'   => $fileName,
+                 'version'     => $version,
+                 'upload_date' => $upload_date,
+                )
+            );
+
+            $user_ID = $DB->pselectOne(
+                "SELECT ID FROM users WHERE userid=:UserID",
+                array('UserID' => $user->getUsername())
+            );
+            $ID      = $DB->pselectOne(
+                "SELECT id FROM data_release WHERE "
+                . "file_name=:file_name AND "
+                . "version=:version AND "
+                . "upload_date=:upload_date",
+                array(
+                 'file_name'   => $fileName,
+                 'version'     => $version,
+                 'upload_date' => $upload_date,
+                )
+            );
+            $success = $DB->insert(
+                'data_release_permissions',
+                array(
+                 'userid'          => $user_ID,
+                 'data_release_id' => $ID,
+                )
+            );
+        }
+        header("Location: {$baseURL}/data_release/?uploadSuccess=true");
+    }
 } else {
     header("HTTP/1.1 400 Bad Request");
     echo "There was an error uploading the file";
