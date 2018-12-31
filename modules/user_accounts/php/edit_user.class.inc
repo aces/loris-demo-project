@@ -783,6 +783,30 @@ class Edit_User extends \NDB_Form
 
         //------------------------------------------------------------
 
+        // active time windows
+
+        $dateOptions = array(
+                        'language'       => 'en',
+                        'format'         => 'YMd',
+                        'addEmptyOption' => 'true',
+                       );
+
+        $dateAttributes = ['class' => 'form-control input-sm input-date'];
+
+        $this->addBasicDate(
+            'active_from',
+            'Active from',
+            $dateOptions,
+            $dateAttributes
+        );
+
+        $this->addBasicDate(
+            'active_to',
+            'Active to',
+            $dateOptions,
+            $dateAttributes
+        );
+
         // checking if the account can be rejected (no password hash
         // pending approval)
 
@@ -1020,20 +1044,6 @@ class Edit_User extends \NDB_Form
                 . 'if you want the system to generate one for you';
         }
 
-        //############################ DEMO ############################
-        // added to prevent any password change on the Demo server (except creating new users)
-        // $pass is null if new user
-        $pass = $DB->pselectOne(
-            "SELECT COALESCE(Password_hash) "
-            . "as Current_password FROM users WHERE UserID = :UID",
-            array('UID' => $this->identifier)
-        );
-        if (!is_null($pass) && ($values['NA_Password'] == 'on' || !empty($values['Password_hash']))) {
-            $errors['Password_Group']
-                = 'Password change has been disabled on the LORIS Demo.';
-        }
-        //############################ DEMO ############################
-
         if (is_null($this->identifier)
             && ($values['NA_Password'] != 'on')
             && empty($values['Password_hash'])
@@ -1099,6 +1109,22 @@ class Edit_User extends \NDB_Form
                 site or clear the 'Examiner status' fields below (i.e.
                 'Radiologist' and 'Pending Approval').";
             }
+        }
+
+        //======================================
+        //    Validate Active time Windows (from - to)
+        //
+        //    Note: the only validation included for the moment
+        //    is that the time form which the user is active
+        //    should be less or equal to the time to it will be active.
+        //======================================
+
+        if (($values['active_to'] != null)
+            && ($values['active_from'] > $values['active_to'])
+        ) {
+            $errors['active_timeWindows']
+                = 'Please notice that the "Active from" 
+                date should be lesser or equal to the "Active to" date.';
         }
         return $errors;
     }

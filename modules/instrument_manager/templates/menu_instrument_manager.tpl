@@ -4,10 +4,7 @@
     <div class="col-xs-4">
         <form method="post" action="{$baseurl}/instrument_manager/" enctype="multipart/form-data">
             <div class="panel panel-primary">
-              {*############################ DEMO ############################*}
-                {*<div class="panel-heading">Upload Instrument</div>*}
-                <div class="panel-heading">Upload Instrument (Functionality disabled on the demo server !!)</div>
-              {*############################ DEMO ############################*}
+                <div class="panel-heading">Upload Instrument</div>
                 <div class="panel-body">
                     <div class="col-xs-12">
                         <input class="fileUpload" type="file" name="install_file">

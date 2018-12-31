@@ -453,10 +453,6 @@ class My_Preferences extends \NDB_Form
                         . 'are identical: please choose another one';
                 }
             }
-            //############################ DEMO ############################
-            $errors['Password_hash']
-                = 'Password change has been disabled on the LORIS Demo.';
-            //############################ DEMO ############################
         }
 
         // Validate email

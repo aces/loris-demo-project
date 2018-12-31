@@ -132,12 +132,6 @@ class Instrument_Manager extends \NDB_Menu_Filter
                 return;
             }
 
-            //############################ DEMO ############################
-            // return on demo here to avoid back-end operations
-            $this->tpl_data['feedback'] = "Uploads disabled on the demo server";
-            return;
-            //############################ DEMO ############################
-
             move_uploaded_file($_FILES['install_file']['tmp_name'], $file_path);
             chmod($file_path, 0644);
             // Scripts in tools/ often make relative imports, so we must change
