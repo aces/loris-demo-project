@@ -158,12 +158,19 @@ function uploadFile()
               'date_uploaded' => date("Y-m-d H:i:s"),
               'language_id'   => $language,
              ];
-
-    if (move_uploaded_file($_FILES["file"]["tmp_name"], $mediaPath . $fileName)) {
+    //############################ DEMO ############################
+    if (unlink($_FILES["file"]["tmp_name"])) {
+    //############################ DEMO ############################
         try {
             // Insert or override db record if file_name already exists
             $db->insertOnDuplicateUpdate('media', $query);
             $uploadNotifier->notify(array("file" => $fileName));
+            //############################ DEMO ############################\
+            showMediaError(
+                "The Demo server does not accept file uploads. 
+                The database has been updated however to maintain the illusion."
+            );
+            //############################ DEMO ############################
         } catch (DatabaseException $e) {
             showMediaError("Could not upload the file. Please try again!");
         }
@@ -332,7 +339,7 @@ function getUploadFields()
  *
  * @return void
  */
-function showMediaError($message)
+function showError($message)
 {
     if (!isset($message)) {
         $message = 'An unknown error occurred!';

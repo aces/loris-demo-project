@@ -77,16 +77,13 @@ if ($userSingleton->hasPermission('document_repository_view')
             mkdir($fullPath, 0770);
         }
 
-        // Copy the uploaded file to the user's upload folder if possible.
-        // Insert a record of the file into the document_repository table
-        if (!move_uploaded_file(
-            $_FILES['file']['tmp_name'],
-            $fullPath . $fileName
-        )) {
-            throw new LorisException(
-                'ERROR: Could not upload file. Contact your administrator.'
-            );
-        } else {
+        //############################ DEMO ############################
+        $target_path = $base_path  . $fileBase;
+//        if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_path)) {
+        if (unlink($_FILES["file"]["tmp_name"])) {
+            echo "The Demo server does not accept file uploads. The database has been
+             updated however to maintain the illusion.";
+         //############################ DEMO ############################
             $success = $DB->insert(
                 'document_repository',
                 array(
