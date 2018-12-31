@@ -362,7 +362,7 @@
     	{/if}
 
 
-
+	
 	{if $form.errors.active_timeWindows}
 		<div class="row form-group form-inline form-inline has-error">
 	{else}

@@ -339,7 +339,7 @@ function getUploadFields()
  *
  * @return void
  */
-function showError($message)
+function showMediaError($message)
 {
     if (!isset($message)) {
         $message = 'An unknown error occurred!';
