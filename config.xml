@@ -29,7 +29,7 @@
                 <seq type="numeric" length="3" min='100' max='999'/> <!-- Ex: AAA1-->
             </structure>
         </PSCID>
-        
+
         <ExternalID>
             <generation>random</generation>
             <structure>
@@ -46,11 +46,6 @@
         </HeaderTable>
         <!-- defines how visit labels are assigned -->
         <visitLabel subprojectID="1">
-            <!-- generation can have either 'user' or 'sequence' to denote user entered or a pre-defined sequence -->
-            <generation>sequence</generation>
-            <regex>/^[A-Z0-9]{2}$/i</regex>
-            <length>2</length>
-            <suggest>V%value%</suggest> <!-- %value% will be substituted for the next unique number -->
             <labelSet>
                 <item value="V1">V1</item>
                 <item value="V2">V2</item>
@@ -58,23 +53,13 @@
             </labelSet>
         </visitLabel>
         <visitLabel subprojectID="2">
-            <!-- generation can have either 'user' or 'sequence' to denote user entered or a pre-defined sequence -->
-            <generation>sequence</generation>
-        <regex>/^[A-Z0-9]{2}$/i</regex>
-        <length>2</length>
-        <suggest>V%value%</suggest> <!-- %value% will be substituted for the next unique number -->
-        <labelSet>
-            <item value="V1">V1</item>
-            <item value="V2">V2</item>
-            <item value="V3">V3</item>
-        </labelSet>
+            <labelSet>
+                <item value="V1">V1</item>
+                <item value="V2">V2</item>
+                <item value="V3">V3</item>
+            </labelSet>
         </visitLabel>
         <visitLabel subprojectID="3">
-            <!-- generation can have either 'user' or 'sequence' to denote user entered or a pre-defined sequence -->
-            <generation>sequence</generation>
-            <regex>/^[A-Z0-9]{2}$/i</regex>
-            <length>2</length>
-            <suggest>V%value%</suggest> <!-- %value% will be substituted for the next unique number -->
             <labelSet>
                 <item value="V3">V3</item>
                 <item value="V4">V4</item>
@@ -83,11 +68,6 @@
             </labelSet>
         </visitLabel>
         <visitLabel subprojectID="4">
-            <!-- generation can have either 'user' or 'sequence' to denote user entered or a pre-defined sequence -->
-            <generation>sequence</generation>
-            <regex>/^[A-Z0-9]{2}$/i</regex>
-            <length>2</length>
-            <suggest>V%value%</suggest> <!-- %value% will be substituted for the next unique number -->
             <labelSet>
                 <item value="V3">V3</item>
                 <item value="V4">V4</item>
@@ -105,7 +85,7 @@
 
         </ReliabilityInstruments>
 
-         <!-- certification module -->
+        <!-- certification module -->
         <Certification>
             <EnableCertification>1</EnableCertification>
             <CertificationProjects>

@@ -1,0 +1,12 @@
+#!/bin/bash
+php /var/www/loris/project/tools/drop_all_tables.php &&
+cat /var/www/loris/project/tables_sql/drop_all_tables_statements.sql | mysql &&
+mysql < /var/www/loris/SQL/0000-00-00-schema.sql &&
+mysql < /var/www/loris/SQL/0000-00-01-Permission.sql &&
+mysql < /var/www/loris/SQL/0000-00-02-Menus.sql &&
+mysql < /var/www/loris/SQL/0000-00-03-ConfigTables.sql &&
+mysql < /var/www/loris/SQL/0000-00-04-Help.sql &&
+cat /var/www/loris/project/tables_sql/instruments/Meta/*.sql | mysql &&
+cat /var/www/loris/project/tables_sql/instruments/*.sql | mysql &&
+cat /var/www/loris/project/tools/cronjob.sql | mysql &&
+for n in /var/www/loris/SQL/RB_files/RB_*.sql; do echo $n; cat $n | mysql || break; done;

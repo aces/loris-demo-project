@@ -132,16 +132,20 @@ class NDB_BVL_Instrument_aosi extends NDB_BVL_Instrument
              "not_answered"     => "Not Answered",
             )
         );
-        $this->addLabel(
+        $this->addScoreColumn(
+            "total_score_1_18",
             "Total Score (Calculated) (items 1-18)"
         );
-        $this->addLabel(
+        $this->addScoreColumn(
+            "total_score_1_18_override",
             "Total Score (Using Overrides) (items 1-18)"
         );
-        $this->addLabel(
+        $this->addScoreColumn(
+            "number_of_markers",
             "Number of Markers (Calculated) (non-zero items, 1-18)"
         );
-        $this->addLabel(
+        $this->addScoreColumn(
+            "number_of_markers_override",
             "Number of Markers (Using Overrides) (non-zero items, 1-18)"
         );
         $this->addTextAreaElement(
@@ -200,7 +204,8 @@ class NDB_BVL_Instrument_aosi extends NDB_BVL_Instrument
             $q1_opts_2
         );
 
-        $this->addLabel(
+        $this->addScoreColumn(
+            "q1_visual_tracking_score",
             "Score (Calculated):"
         );
 
@@ -237,7 +242,8 @@ class NDB_BVL_Instrument_aosi extends NDB_BVL_Instrument
             )
         );
 
-        $this->addLabel(
+        $this->addScoreColumn(
+            "q2_disengagement_of_attention_score",
             "Score (Calculated):"
         );
 
@@ -281,7 +287,8 @@ class NDB_BVL_Instrument_aosi extends NDB_BVL_Instrument
             )
         );
 
-        $this->addLabel(
+        $this->addScoreColumn(
+            "q3_orients_to_name_score",
             "Score (Calculated):"
         );
         $this->addTextAreaElement(
@@ -305,7 +312,8 @@ class NDB_BVL_Instrument_aosi extends NDB_BVL_Instrument
              "not_answered" => "Not Answered",
             )
         );
-        $this->addLabel(
+        $this->addScoreColumn(
+            "q4_differential_response_to_facial_emotion_score",
             "Score:"
         );
         $this->addTextAreaElement(
@@ -330,7 +338,8 @@ class NDB_BVL_Instrument_aosi extends NDB_BVL_Instrument
              "not_answered" => "Not Answered",
             )
         );
-        $this->addLabel(
+        $this->addScoreColumn(
+            "q5_anticipatory_response_score",
             "Score:"
         );
         $this->addTextAreaElement(
@@ -407,7 +416,8 @@ class NDB_BVL_Instrument_aosi extends NDB_BVL_Instrument
             )
         );
 
-        $this->addLabel(
+        $this->addScoreColumn(
+            "q6_imitation_of_actions_score",
             "Score (calculated):"
         );
         $this->addTextAreaElement(
