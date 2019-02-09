@@ -542,12 +542,9 @@ class NDB_BVL_Instrument_aosi extends NDB_BVL_Instrument
         $db =& Database::singleton();
 
         // null scores
-        $this->_nullScores();
+        $this->_nullScores($this->scores);
 
-        //Get raw questions point values
-        $query = "SELECT * FROM ".$this->table." WHERE CommentID='".$this->getCommentID()."'";
-        $db->selectRow($query, $score_record);
-
+        $score_record = NDB_BVL_Instrument::loadInstanceData($this);
         //Calculate first 6 item scores from their input grids
 
         //Question 1
@@ -622,13 +619,13 @@ class NDB_BVL_Instrument_aosi extends NDB_BVL_Instrument
         //Question 3
         //calculate
         //2
-        if($score_record[TrialName(1, 1)] != null
-            && $score_record[TrialName(2, 1)] != null
-            && !empty($score_record[TrialName(1, 1)])
-            && !empty($score_record[TrialName(2, 1)])
+        if($score_record[$this->TrialName(1, 1)] != null
+            && $score_record[$this->TrialName(2, 1)] != null
+            && !empty($score_record[$this->TrialName(1, 1)])
+            && !empty($score_record[$this->TrialName(2, 1)])
         ) {
-            if($score_record[TrialName(1, 1)] == "not_answered"
-                || $score_record[TrialName(2, 1)] == "not_answered"
+            if($score_record[$this->TrialName(1, 1)] == "not_answered"
+                || $score_record[$this->TrialName(2, 1)] == "not_answered"
             ) {
                 $this->scores["q3_orients_to_name_score"] = "Unable to score";
             } elseif($score_record["q3_orients_to_name_press_1_trial_1"] != "orients_with_eye_contact"
@@ -770,13 +767,13 @@ class NDB_BVL_Instrument_aosi extends NDB_BVL_Instrument
 
         // update if any scores
         if (is_array($this->scores) && count($this->scores)>0) {
-            $result = $db->update(
-                $this->table,
-                $this->scores,
-                array('CommentID' => $this->getCommentID())
-            );
+            $this->_save($this->scores);
         }
 
     }
+
+    public function TrialName($press, $trial) {
+        return "q3_orients_to_name_press_" . $press .
+            "_trial_" . $trial;
+    }
 }
-?>

@@ -150,7 +150,8 @@ class NDB_BVL_Instrument_medical_history extends NDB_BVL_Instrument
         $this->XINRegisterRule(
             "arthritis_age",
             array("arthritis{@}=={@}yes"),
-            "Required."
+            "Required.",
+            "arthritis_age_group"
         );
 
         // Header
@@ -236,7 +237,8 @@ class NDB_BVL_Instrument_medical_history extends NDB_BVL_Instrument
         $this->XINRegisterRule(
             "hypertension_while_pregnant_age",
             array("hypertension_while_pregnant{@}=={@}yes"),
-            "Required."
+            "Required.",
+            "hypertension_while_pregnant_age_group"
         );
 
     }
