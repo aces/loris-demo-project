@@ -12,12 +12,8 @@
     <include>lorisDB.xml</include>
     <!-- set to 1 if development environment -->
     <dev>
-        <sandbox>1</sandbox>
+        <sandbox>0</sandbox>
     </dev>
-
-    <!-- MINC TOOLS PATH -->
-    <MINCToolsPath>/opt/minc/</MINCToolsPath>
-
 
     <!-- study variables -->
     <study>
@@ -75,15 +71,6 @@
                 <item value="V6">V6</item>
             </labelSet>
         </visitLabel>
-        <!-- Instruments for reliability module -->
-        <ReliabilityInstruments>
-            <Instrument>
-                <Testname>bmi</Testname>
-                <Threshold>0.5</Threshold>
-                <Displayname>BMI</Displayname>
-            </Instrument>
-
-        </ReliabilityInstruments>
 
         <!-- certification module -->
         <Certification>
@@ -100,8 +87,6 @@
                 <test value="radiology_review">Radiology Review</test>
             </CertificationInstruments>
         </Certification>
-        <!--This permission allows users from sites to have access to other sites bvl feedback info -->
-        <multiSiteEnabledCenters>0</multiSiteEnabledCenters>
 
     </study>
     <!-- end of study definition -->
@@ -135,5 +120,7 @@
         </instrument>
     </instrumentPermissions>
 
-</config>
+    <!-- MINC TOOLS PATH -->
+    <MINCToolsPath>/opt/minc/</MINCToolsPath>
 
+</config>
