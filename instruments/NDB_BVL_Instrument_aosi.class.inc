@@ -29,7 +29,7 @@ class NDB_BVL_Instrument_aosi extends NDB_BVL_Instrument
      * @return void
      * @access public
      */
-    function setup($commentID = NULL, $page = NULL)
+    function setup(?string $commentID = null, ?string $page = null): void
     {
         $this->formType ="XIN";
         $this->form     = new LorisForm('test_form');
@@ -529,7 +529,7 @@ class NDB_BVL_Instrument_aosi extends NDB_BVL_Instrument
     }
 
 
-    function score()
+    function score(): void
     {
         if($this->_determineDataEntryCompletionStatus() == "Incomplete") {
             return;

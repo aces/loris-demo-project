@@ -36,7 +36,7 @@ class NDB_BVL_Instrument_medical_history extends NDB_BVL_Instrument
      * @return void
      * @access public
      */
-    function setup($commentID = null, $page = null)
+    function setup(?string $commentID = null, ?string $page = null): void
     {
         $this->formType ='XIN';
         $this->form     = new LorisForm('test_form');
