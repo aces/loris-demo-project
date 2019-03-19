@@ -26,6 +26,8 @@ class NDB_BVL_Instrument_medical_history extends NDB_BVL_Instrument
 
     var $ValidityEnabled  = false;
     var $ValidityRequired = false;
+    var $jsonData = true;
+
 
     /**
      * Sets up basic data, such as the HTML_Quickform object, and so on.

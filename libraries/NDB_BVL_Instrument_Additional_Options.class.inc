@@ -132,11 +132,11 @@ class NDB_BVL_Instrument_Additional_Options extends NDB_BVL_Instrument
      * @return none
      */
     function addHourMinElement(
-        $field,
-        $label,
-        $rules = array(),
-        $rule_message = null
-    ) {
+        string $field,
+        string $label,
+        array $rules = array(),
+        ?string $rule_message = null
+    ): void {
         if ($rule_message === null) {
             $rule_message = "You are required to select a status "
                 . "if you want to leave this time blank.";
@@ -177,8 +177,11 @@ class NDB_BVL_Instrument_Additional_Options extends NDB_BVL_Instrument
      *
      * @return none
      */
-    function addDateElement($name, $label, $options = null)
-    {
+    function addDateElement(
+        string $name,
+        string $label,
+        array $options = array()
+    ): void {
         if ($options === null) {
             $options = $this->dateOptions;
         }
@@ -225,7 +228,7 @@ class NDB_BVL_Instrument_Additional_Options extends NDB_BVL_Instrument
      * @return void
      * @access private
      */
-    function _addMetadataFields()
+    function _addMetadataFields(): void
     {
         $config      =& NDB_Config::singleton();
         $dateOptions = array(
@@ -291,12 +294,15 @@ class NDB_BVL_Instrument_Additional_Options extends NDB_BVL_Instrument
      * @return none
      */
     function addTextElement(
-        $field,
-        $label,
-        $rules=array(),
-        $rule_message='This field is required.'
-
-    ) {
+        string $field,
+        string $label,
+        array $rules=array(),
+        string $rule_message='This field is required.',
+        array $refusals = array(
+            ''             => '',
+            'not_answered' => 'Not Answered',
+        )
+    ): void {
         $group[] = $this->createText($field, $label);
         $this->WrapperTextElements[$field] = $group[0];
         $group[] = $this->createSelect(
@@ -324,8 +330,10 @@ class NDB_BVL_Instrument_Additional_Options extends NDB_BVL_Instrument
      *
      * @return none
      */
-    function addNumericElement($field, $label, $options = null)
-    {
+    function addNumericElement(
+        string $field,
+        string $label
+    ): void {
         $group[] = $this->createText($field, $label);
         $this->WrapperNumericElements[$field] = $group[0];
         $group[] = $this->createSelect(
