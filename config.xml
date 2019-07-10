@@ -121,6 +121,6 @@
     </instrumentPermissions>
 
     <!-- MINC TOOLS PATH -->
-    <MINCToolsPath>/opt/minc/</MINCToolsPath>
+    <MINCToolsPath>/opt/minc/1.9.16/</MINCToolsPath>
 
 </config>
