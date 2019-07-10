@@ -5,9 +5,9 @@ UPDATE Config SET Value='https://demo.loris.ca' WHERE ConfigID=(SELECT ID FROM C
 
 -- Some of these are already in the RB dump but they are reapplied here to make sure that a change in the RB dataset does not affect the proper functioning of DEMO
 UPDATE Config SET Value='/data/genomics/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='GenomicDataPath');
-UPDATE Config SET Value='/data/demo/data' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='data');
-UPDATE Config SET Value='/data/demo/data' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='mincPath');
-UPDATE Config SET Value='/data/demo/data' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='imagePath');
+UPDATE Config SET Value='/data/demo/data/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='data');
+UPDATE Config SET Value='/data/demo/data/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='mincPath');
+UPDATE Config SET Value='/data/demo/data/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='imagePath');
 UPDATE Config SET Value='/data/download/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='DownloadPath');
 UPDATE Config SET Value='/data/incoming/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='IncomingPath');
 UPDATE Config SET Value='/data/incoming/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='MRIUploadIncomingPath');
