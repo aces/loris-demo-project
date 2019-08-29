@@ -443,6 +443,10 @@ class My_Preferences extends \NDB_Form
                         . 'are identical: please choose another one';
                 }
             }
+            //############################ DEMO ############################
+            $errors['Password_hash']
+                = 'Password change has been disabled on the LORIS Demo.';
+            //############################ DEMO ############################
             if (\User::pwnedPassword($values['Password_hash'])) {
                 $errors['Password_hash'] = 'The password you chose is too '
                     . 'common. Please choose a more unique password.';

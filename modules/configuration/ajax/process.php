@@ -32,40 +32,48 @@ $DB      = $factory->database();
 foreach ($_POST as $key => $value) {
     if (is_numeric($key)) { //update
         if ($value == "") {
-            $DB->delete('Config', array('ID' => $key));
+            //############################ DEMO ############################
+//            $DB->delete('Config', array('ID' => $key));
+            //############################ DEMO ############################
         } else {
-            // if no duplicate value then do updating
-            if (noDuplicateInDropdown($key, $value)) {
-                $DB->update(
-                    'Config',
-                    array('Value' => $value),
-                    array('ID' => $key)
-                );
-            } else {
-                   header("HTTP/1.1 400 Bad Request");
-                   exit();
-            }
+            //############################ DEMO ############################
+//            // if no duplicate value then do updating
+//            if (noDuplicateInDropdown($key, $value)) {
+//                $DB->update(
+//                    'Config',
+//                    array('Value' => $value),
+//                    array('ID' => $key)
+//                );
+//            } else {
+//                   header("HTTP/1.1 400 Bad Request");
+//                   exit();
+//            }
+            //############################ DEMO ############################
         }
     } else { //add new or remove
         $keySplit   = explode("-", $key);
         $valueSplit = explode("-", $value);
         if ($keySplit[0] == 'add') {
             if ($value !== "") {
-                if (countDuplicate($keySplit[1], $value) == '0') {
-                    $DB->insert(
-                        'Config',
-                        array(
-                         'ConfigID' => $keySplit[1],
-                         'Value'    => $value,
-                        )
-                    );
-                } else {
-                        header("HTTP/1.1 303 Duplicate value");
-                        exit();
-                }
+                //############################ DEMO ############################
+//                if (countDuplicate($keySplit[1], $value) == '0') {
+//                    $DB->insert(
+//                        'Config',
+//                        array(
+//                         'ConfigID' => $keySplit[1],
+//                         'Value'    => $value,
+//                        )
+//                    );
+//                } else {
+//                        header("HTTP/1.1 303 Duplicate value");
+//                        exit();
+//                }
+                //############################ DEMO ############################
             }
         } elseif ($valueSplit[0] == 'remove') {
-            $DB->delete('Config', array('ID' => $valueSplit[1]));
+            //############################ DEMO ############################
+//            $DB->delete('Config', array('ID' => $valueSplit[1]));
+            //############################ DEMO ############################
         }
     }
 }
