@@ -1172,6 +1172,20 @@ class Edit_User extends \NDB_Form
                 . 'if you want the system to generate one for you';
         }
 
+        //############################ DEMO ############################
+        // added to prevent any password change on the Demo server (except creating new users)
+        // $pass is null if new user
+        $pass = $DB->pselectOne(
+            "SELECT COALESCE(Password_hash) "
+            . "as Current_password FROM users WHERE UserID = :UID",
+            array('UID' => $this->identifier)
+        );
+        if (!is_null($pass) && ($values['NA_Password'] == 'on' || !empty($values['Password_hash']))) {
+            $errors['Password_Group']
+                = 'Password change has been disabled on the LORIS Demo.';
+        }
+        //############################ DEMO ############################
+
         if (is_null($this->identifier)
             && ($values['NA_Password'] != 'on')
             && empty($plaintext)
