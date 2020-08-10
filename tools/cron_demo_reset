@@ -2,7 +2,7 @@
 php /var/www/loris/project/tools/drop_all_tables.php &&
 cat /var/www/loris/project/tables_sql/drop_all_tables_statements.sql | mysql &&
 echo "##### COPYING INSTRUMENTS FROM LORIS #####" >&2 &&
-cp /var/www/loris/raisinbread/instruments/* /var/www/loris/project/instruments/ ;
+cp /var/www/loris/raisinbread/instruments/* /var/www/loris/project/instruments/ &&
 echo "##### SOURCING LORIS SCHEMA #####" >&2 &&
 for n in /var/www/loris/SQL/0000-00-*.sql; do echo $n; cat $n | mysql || break; done &&
 echo "##### SOURCING INSTRUMENT SCHEMA #####" >&2 &&
@@ -10,4 +10,4 @@ for n in /var/www/loris/raisinbread/instruments/instrument_sql/*.sql; do echo $n
 echo "##### SOURCING RAISINBREAD FILES #####" >&2 &&
 for n in /var/www/loris/raisinbread/RB_files/*.sql; do echo $n; cat $n | mysql || break; done &&
 echo "##### CUSTOMIZING CONFIGS #####" >&2 &&
-cat /var/www/loris/project/tools/cronjob.sql | mysql;
+cat /var/www/loris/project/tools/cronjob.sql | mysql
