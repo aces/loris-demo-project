@@ -11,7 +11,7 @@
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
-
+use Facebook\WebDriver\WebDriverBy;
 require_once __DIR__
     . "/../../../test/integrationtests/".
     "LorisIntegrationTest.class.inc";
@@ -36,9 +36,6 @@ class ConfigurationTest extends LorisIntegrationTest
     function setUp()
     {
         parent::setUp();
-        $window = new WebDriverWindow($this->webDriver);
-        $size   = new WebDriverDimension(1280, 1024);
-        $window->setSize($size);
     }
 
     /**
@@ -81,9 +78,9 @@ class ConfigurationTest extends LorisIntegrationTest
     {
          $this->setupPermissions(array("config"));
          $this->safeGet($this->url . "/configuration/");
-         $bodyText = $this->webDriver->findElement(
-             WebDriverBy::cssSelector("body")
-         )->getText();
+        $bodyText = $this->webDriver->findElement(
+            WebDriverBy::cssSelector("body")
+        )->getText();
          $this->assertNotContains("You do not have access to this page.", $bodyText);
          $this->resetPermissions();
     }
@@ -96,9 +93,9 @@ class ConfigurationTest extends LorisIntegrationTest
     {
          $this->setupPermissions(array());
          $this->safeGet($this->url . "/configuration/");
-         $bodyText = $this->webDriver->findElement(
-             WebDriverBy::cssSelector("body")
-         )->getText();
+        $bodyText = $this->webDriver->findElement(
+            WebDriverBy::cssSelector("body")
+        )->getText();
          $this->assertContains("You do not have access to this page.", $bodyText);
          $this->resetPermissions();
     }
@@ -110,9 +107,9 @@ class ConfigurationTest extends LorisIntegrationTest
     public function testSubproject()
     {
          $this->safeGet($this->url . "/configuration/subproject/");
-         $bodyText = $this->webDriver->findElement(
-             WebDriverBy::cssSelector("body")
-         )->getText();
+        $bodyText = $this->webDriver->findElement(
+            WebDriverBy::cssSelector("body")
+        )->getText();
          $this->assertContains("SubprojectID", $bodyText);
     }
     /**
@@ -123,17 +120,17 @@ class ConfigurationTest extends LorisIntegrationTest
     private function _testSubprojectBreadcrumbs()
     {
          $this->safeGet($this->url . "/configuration/subproject/");
-         $webElement = $this->safeFindElement(
-             WebDriverBy::Xpath("//*[@id='bc2']/a[2]/div")
-         )->click();
-         $bodyText   = $this->webDriver->findElement(
-             WebDriverBy::cssSelector("body")
-         )->getText();
+        $this->safeFindElement(
+            WebDriverBy::Xpath("//*[@id='bc2']/a[2]/div")
+        )->click();
+        $bodyText = $this->webDriver->findElement(
+            WebDriverBy::cssSelector("body")
+        )->getText();
 
-         $this->assertContains(
-             "To configure study subprojects click here.",
-             $bodyText
-         );
+        $this->assertContains(
+            "To configure study subprojects click here.",
+            $bodyText
+        );
     }
     /**
      * Tests links, click each link, the particular content shows on the page.
@@ -150,20 +147,20 @@ class ConfigurationTest extends LorisIntegrationTest
         $this->_linkTest("WWW");
         $this->_linkTest("Dashboard");
         $this->_linkTest("Imaging Modules");
-        $this->_linkTest("Statistics");
+        // $this->_linkTest("Statistics"); will be rewritten by REACT test
         $this->_linkTest("Email");
         $this->_linkTest("Uploads");
         $this->_linkTest("API Keys");
 
     }
     /**
-      * Add a method for testing the link. After click the link,the page
-      * shows particular content.
-      *
-      * @param string $text the text that should be shown in the assert.
-      *
-      * @return void
-      */
+     * Add a method for testing the link. After click the link,the page
+     * shows particular content.
+     *
+     * @param string $text the text that should be shown in the assert.
+     *
+     * @return void
+     */
     private function _linkTest($text)
     {
         $this->safeClick(WebDriverBy::linkText($text));
@@ -175,10 +172,10 @@ class ConfigurationTest extends LorisIntegrationTest
     }
 
     /**
-      *  If test on local machine, then run this function.
-      *
-      *  @return void
-      */
+     *  If test on local machine, then run this function.
+     *
+     * @return void
+     */
     public function testLocal()
     {
         $config  =& NDB_Config::singleton();
@@ -193,10 +190,10 @@ class ConfigurationTest extends LorisIntegrationTest
         }
     }
     /**
-      * Test project link appears
-      *
-      *  @return void
-      */
+     * Test project link appears
+     *
+     * @return void
+     */
     private function _testProjectsLink()
     {
         $this->safeGet($this->url . "/configuration/");
