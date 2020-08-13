@@ -3,6 +3,7 @@ UPDATE Config SET Value='demo.loris.ca' WHERE ConfigID=(SELECT ID FROM ConfigSet
 UPDATE Config SET Value='LORIS Demonstration Database' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='title');
 UPDATE Config SET Value='https://demo.loris.ca' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='url');
 UPDATE Config SET Value='images/LORIS_logo.png' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='studylogo');
+UPDATE Config SET Value='This is not S3cret anymore!' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='JWTKey');
 
 -- Some of these are already in the RB dump but they are reapplied here to make sure that a change in the RB dataset does not affect the proper functioning of DEMO
 UPDATE Config SET Value='/data/genomics/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='GenomicDataPath');
