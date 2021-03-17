@@ -1,0 +1,10 @@
+instruments/NDB_BVL_Instrument_aosi.class.inc
+instruments/NDB_BVL_Instrument_medical_history.class.inc
+instruments/NDB_BVL_Instrument_mri_parameter_form.class.inc
+instruments/NDB_BVL_Instrument_radiology_review.class.inc
+instruments/bmi.linst
+instruments/bmi.readme
+instruments/bmi.rules
+instruments/bmi.score
+tables_sql/crontab.sql
+tables_sql/drop_all_tables_statements.sql

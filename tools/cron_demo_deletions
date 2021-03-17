@@ -2,9 +2,9 @@
 echo "##### CLEANING INSTRUMENTS DIRECTORY #####" >&2 &&
 find /var/www/loris/project/instruments/ -type f -not -name 'README.md' -delete &&
 echo "##### CLEARING DATA RELEASE UPLOADS #####" >&2 &&
-rm -rf /var/www/loris/modules/data_release/user_uploads/* &&
+rm -rf /data/data_release_uploads/* &&
 echo "##### CLEARING DOCUMENT REPOSITORY UPLOADS #####" >&2 &&
-rm -rf /var/www/loris/modules/document_repository/user_uploads/* &&
+rm -rf /data/document_repository_uploads/* &&
 echo "##### CLEARING GENOMICS UPLOADS #####" >&2 &&
 rm -rf /data/genomics/* &&
 echo "##### CLEARING MRI UPLOADS #####" >&2 &&
@@ -15,6 +15,6 @@ rm -rf /data/download/* &&
 echo "##### CLEARING MEDIA UPLOADS #####" >&2 &&
 rm -rf /data/mediaUploads/* &&
 echo "##### CLEARING INSTRUMENT MANAGER UPLOADS #####" >&2 &&
-find /var/www/loris/project/instruments/ -type f -not -name "bmi.linst" -not -name "bmi.readme" -not -name "bmi.rules" -not -name "bmi.score" -not -name "NDB_BVL_Instrument_radiology_review.class.inc" -not -name "NDB_BVL_Instrument_mri_parameter_form.class.inc" -not -name "NDB_BVL_Instrument_medical_history.class.inc" -not -name "NDB_BVL_Instrument_aosi.class.inc" -delete;
+find /var/www/loris/project/instruments/ -type f -not -name "bmi.linst" -not -name "bmi.readme" -not -name "bmi.rules" -not -name "bmi.score" -not -name "NDB_BVL_Instrument_radiology_review.class.inc" -not -name "NDB_BVL_Instrument_mri_parameter_form.class.inc" -not -name "NDB_BVL_Instrument_medical_history.class.inc" -not -name "NDB_BVL_Instrument_aosi.class.inc" -not -name "README.md" -delete;
 
 
