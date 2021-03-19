@@ -1,6 +1,4 @@
 #!/bin/bash
-echo "##### CLEANING INSTRUMENTS DIRECTORY #####" >&2 &&
-find /var/www/loris/project/instruments/ -type f -not -name 'README.md' -delete &&
 echo "##### CLEARING DATA RELEASE UPLOADS #####" >&2 &&
 rm -rf /data/data_release_uploads/* &&
 echo "##### CLEARING DOCUMENT REPOSITORY UPLOADS #####" >&2 &&
