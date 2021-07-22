@@ -15,6 +15,8 @@ UPDATE Config SET Value='/data/incoming/' WHERE ConfigID=(SELECT ID FROM ConfigS
 UPDATE Config SET Value='/data/incoming/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='MRIUploadIncomingPath');
 UPDATE Config SET Value='/data/mediaUploads/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='mediaPath');
 UPDATE Config SET Value='/data/demo/bin/mri/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='MRICodePath');
+UPDATE Config SET Value='/data/demo/data/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='dataDirBasepath');
+UPDATE Config SET Value='/data/demo/data/tarchive/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='tarchiveLibraryDir');
 UPDATE Config SET Value='true' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='useEDC');
 UPDATE Config SET Value='true' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='showTransferStatus');
 UPDATE Config SET Value='99' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='ageMax');
