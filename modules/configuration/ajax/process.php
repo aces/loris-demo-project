@@ -149,10 +149,10 @@ function isDuplicate($key, $value): bool
     $DB      = $factory->database();
     $result  = $DB->pselectOne(
         "SELECT COUNT(*) FROM Config WHERE ConfigID =:ConfigID AND Value =:Value",
-        array(
+        [
             'ConfigID' => $key,
             'Value'    => $value,
-        )
+        ]
     );
     return intval($result) > 0;
 }
@@ -171,15 +171,15 @@ function noDuplicateInDropdown($id,$value)
        // ConfigID can be found in the Config table by searching new id.
     $ConfigID = $DB->pselectOne(
         "SELECT ConfigID FROM Config WHERE ID =:ID",
-        array('ID' => $id)
+        ['ID' => $id]
     );
        // IDBefore means that row ID contains the same configID and value pair.
     $IDBefore = $DB->pselectOne(
         "SELECT ID FROM Config WHERE ConfigID =:ConfigID AND Value =:Value",
-        array(
+        [
             'ConfigID' => $ConfigID,
             'Value'    => $value,
-        )
+        ]
     );
        //If the new "id" equals "IDBefore" in Config table means
        //it can be updated in the table. Otherwise, it means Dropdown menu has
@@ -201,7 +201,7 @@ function noDuplicateInDropdown($id,$value)
  */
 function getPathIDs(string $table): array
 {
-    if (! in_array($table, array('Config', 'ConfigSettings', true))) {
+    if (! in_array($table, ['Config', 'ConfigSettings', true])) {
         throw new \LorisException('Table must be "Config" or "ConfigSettings"');
     }
     $query = '';
@@ -220,7 +220,7 @@ function getPathIDs(string $table): array
             . "WHERE DataType = 'web_path';";
         break;
     }
-    return \Database::singleton()->pselectCol($query, array());
+    return \NDB_Factory::singleton()->database()->pselectCol($query, []);
 }
 
 /**

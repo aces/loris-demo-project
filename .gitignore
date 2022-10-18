@@ -6,5 +6,6 @@ instruments/bmi.linst
 instruments/bmi.readme
 instruments/bmi.rules
 instruments/bmi.score
+instruments/bmi.meta
 tables_sql/crontab.sql
 tables_sql/drop_all_tables_statements.sql
