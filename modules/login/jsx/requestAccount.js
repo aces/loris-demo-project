@@ -7,10 +7,8 @@ import swal from 'sweetalert2';
  * Request account form.
  *
  * @description form for request account.
- *
  * @author Alizée Wickenheiser
  * @version 1.0.0
- *
  */
 class RequestAccount extends Component {
   /**
@@ -22,9 +20,9 @@ class RequestAccount extends Component {
     this.state = {
       form: {
         value: {
-          firstname: '',
-          lastname: '',
-          email: '',
+          firstname: this.props.defaultFirstName || '',
+          lastname: this.props.defaultLastName || '',
+          email: this.props.defaultEmail || '',
           site: this.props.data.site
             ? Object.keys(this.props.data.site)['']
             : '',
@@ -118,6 +116,7 @@ class RequestAccount extends Component {
   loadGoogleCaptcha() {
     /**
      * Dynamically load a script if necessary.
+     *
      * @param {string} url - script to load.
      */
     function loadScript(url) {
@@ -154,7 +153,7 @@ class RequestAccount extends Component {
           name={'requestAccount'}
           action={''}
           id={'form'}
-          fileUpload={'false'}
+          fileUpload={false}
           onSubmit={this.handleSubmit}
         >
           <StaticElement
@@ -262,6 +261,10 @@ RequestAccount.propTypes = {
   module: PropTypes.string,
   setMode: PropTypes.func,
   data: PropTypes.object,
+
+  defaultFirstName: PropTypes.string,
+  defaultLastName: PropTypes.string,
+  defaultEmail: PropTypes.string,
 };
 
 export default RequestAccount;
