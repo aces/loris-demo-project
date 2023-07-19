@@ -1223,7 +1223,7 @@ class Edit_User extends \NDB_Form
             array('UID' => $this->identifier)
         );
         if (!is_null($pass) && ($values['NA_Password'] == 'on' || !empty($values['Password_hash']))) {
-            $errors['Password_Group']
+            $errors['Password']
                 = 'Password change has been disabled on the LORIS Demo.';
         }
         //############################ DEMO ############################
