@@ -38,7 +38,7 @@ foreach ($_POST as $key => $value) {
         if ($value == "") {
             // A blank value is the same as deleting.
             //############################ DEMO ############################
-//            $DB->delete('Config', array('ID' => $key));
+            // $DB->delete('Config', ['ID' => $key]);
             //############################ DEMO ############################
         } else {
             if (! noDuplicateInDropdown($key, $value)) {
@@ -63,11 +63,11 @@ foreach ($_POST as $key => $value) {
             }
             // Update the config setting to the new value.
             //############################ DEMO ############################
-//            $DB->update(
-//                'Config',
-//                array('Value' => $value),
-//                array('ID' => $key)
-//            );
+            // $DB->unsafeUpdate(
+            //     'Config',
+            //     ['Value' => $value],
+            //     ['ID' => $key]
+            // );
             //############################ DEMO ############################
         }
     } else {
@@ -84,6 +84,7 @@ foreach ($_POST as $key => $value) {
         $keySplit         = explode("-", $key); // e.g. 'add-17-1' or 'remove'
         $action           = $keySplit[0];
         $ConfigSettingsID = $keySplit[1];
+        error_log(print_r($value, true));
         $valueSplit       = explode("-", $value); // e.g. "remove-74"
         $removeID         = $valueSplit[1];
         //assert(count($keySplit) == 2);
@@ -113,21 +114,21 @@ foreach ($_POST as $key => $value) {
             }
             // Add the new setting
             //############################ DEMO ############################
-//            $DB->insert(
-//                'Config',
-//                array(
-//                    'ConfigID' => $ConfigSettingsID, // FK to ConfigSettings.
-//                    'Value'    => $value,
-//                )
-//            );
+            // $DB->unsafeInsert(
+            //     'Config',
+            //     [
+            //         'ConfigID' => $ConfigSettingsID, // FK to ConfigSettings.
+            //         'Value'    => $value,
+            //     ]
+            // );
             //############################ DEMO ############################
         } elseif ($action == 'remove') {
             // Delete an entry from the Config table.
             //############################ DEMO ############################
-//            $DB->delete(
-//                'Config',
-//                array('ID' => $removeID)
-//            );
+            // $DB->delete(
+            //     'Config',
+            //     ['ID' => $removeID]
+            // );
             //############################ DEMO ############################
         } else {
             displayError(400, 'Invalid action');
