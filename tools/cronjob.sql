@@ -22,7 +22,6 @@ UPDATE Config SET Value='true' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHE
 UPDATE Config SET Value='99' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='ageMax');
 UPDATE Config SET Value='/[a-zA-Z]{3}[0-9]{4}_[0-9]{6}_[vV][0-9]+/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='patientIDRegex');
 
-
 -- Add double-data-entry instruments
 INSERT INTO Config (ConfigID,Value)
 SELECT cs.ID, t.Test_name
@@ -30,4 +29,5 @@ FROM ConfigSettings cs JOIN test_names t
 WHERE cs.Name='DoubleDataEntryInstruments';
 
 -- Set user pass demo20!7
-UPDATE users SET Password_hash='$2y$10$6pjQ.x5rPY7voNFs2w/eI.pzLL8H/9wPZ98nabvBOEwDBClhK0l1S', Pending_approval='N', Active='Y' WHERE UserID='admin';
+UPDATE users SET Pending_approval='N', Active='Y', Password_hash='$2y$10$6pjQ.x5rPY7voNFs2w/eI.pzLL8H/9wPZ98nabvBOEwDBClhK0l1S' WHERE UserID='admin';
+INSERT INTO user_login_history (userID,Success,Page_requested) VALUE ('admin','Y','/');
