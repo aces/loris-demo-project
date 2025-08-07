@@ -11,7 +11,7 @@
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
-
+use Facebook\WebDriver\WebDriverBy;
 require_once __DIR__
     . "/../../../test/integrationtests/".
     "LorisIntegrationTest.class.inc";
@@ -33,13 +33,9 @@ class ConfigurationTest extends LorisIntegrationTest
      *
      * @return void
      */
-    function setUp()
+    function setUp(): void
     {
         parent::setUp();
-        $window = new WebDriverWindow($this->webDriver);
-        $size   = new WebDriverDimension(1280, 1024);
-        $window->setSize($size);
-        $this->setUpConfigSetting("useProjects", "false");
     }
 
     /**
@@ -47,11 +43,11 @@ class ConfigurationTest extends LorisIntegrationTest
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->DB->delete(
-            "subproject",
-            array('title' => 'Test Test Test')
+            "cohort",
+            ['title' => 'Test Test Test']
         );
         parent::tearDown();
     }
@@ -65,10 +61,21 @@ class ConfigurationTest extends LorisIntegrationTest
     public function testConfigurationPageLoads()
     {
         $this->safeGet($this->url . "/configuration/");
-
-        $bodyText = $this->webDriver
-            ->findElement(WebDriverBy::cssSelector("body"))->getText();
-        $this->assertContains("Configuration", $bodyText);
+        $bodyText = $this->safeFindElement(
+            WebDriverBy::cssSelector("body")
+        )->getText();
+        $this->assertMatchesRegularExpression(
+            "/Please enter the various configuration variables/",
+            $bodyText
+        );
+        $this->assertStringNotContainsString(
+            "You do not have access to this page.",
+            $bodyText
+        );
+        $this->assertStringNotContainsString(
+            "An error occured while loading the page.",
+            $bodyText
+        );
     }
     /**
      * Tests that configuration loads with the permission
@@ -77,12 +84,15 @@ class ConfigurationTest extends LorisIntegrationTest
      */
     public function testConfigPermission()
     {
-         $this->setupPermissions(array("config"));
+         $this->setupPermissions(["config"]);
          $this->safeGet($this->url . "/configuration/");
-         $bodyText = $this->webDriver->findElement(
-             WebDriverBy::cssSelector("body")
-         )->getText();
-         $this->assertNotContains("You do not have access to this page.", $bodyText);
+        $bodyText = $this->safeFindElement(
+            WebDriverBy::cssSelector("body")
+        )->getText();
+        $this->assertStringNotContainsString(
+            "You do not have access to this page.",
+            $bodyText
+        );
          $this->resetPermissions();
     }
     /**
@@ -92,46 +102,49 @@ class ConfigurationTest extends LorisIntegrationTest
      */
     public function testConfigWithoutPermission()
     {
-         $this->setupPermissions(array());
+         $this->setupPermissions([]);
          $this->safeGet($this->url . "/configuration/");
-         $bodyText = $this->webDriver->findElement(
-             WebDriverBy::cssSelector("body")
-         )->getText();
-         $this->assertContains("You do not have access to this page.", $bodyText);
+        $bodyText = $this->safeFindElement(
+            WebDriverBy::cssSelector("body")
+        )->getText();
+        $this->assertStringContainsString(
+            "You do not have access to this page.",
+            $bodyText
+        );
          $this->resetPermissions();
     }
     /**
-     * Tests that subproject panel in configuration
+     * Tests that cohort panel in configuration
      *
      * @return void
      */
-    public function testSubproject()
+    public function testCohort()
     {
-         $this->safeGet($this->url . "/configuration/subproject/");
-         $bodyText = $this->webDriver->findElement(
-             WebDriverBy::cssSelector("body")
-         )->getText();
-         $this->assertContains("SubprojectID", $bodyText);
+         $this->safeGet($this->url . "/configuration/cohort/");
+        $bodyText = $this->safeFindElement(
+            WebDriverBy::cssSelector("#\#cohortnew")
+        )->getText();
+         $this->assertStringContainsString("CohortID", $bodyText);
     }
     /**
-     * Tests that subproject navigate back to config page
+     * Tests that cohort navigate back to config page
      *
      * @return void
      */
-    private function _testSubprojectBreadcrumbs()
+    private function _testCohortBreadcrumbs()
     {
-         $this->safeGet($this->url . "/configuration/subproject/");
-         $webElement = $this->safeFindElement(
-             WebDriverBy::Xpath("//*[@id='bc2']/a[2]/div")
-         )->click();
-         $bodyText   = $this->webDriver->findElement(
-             WebDriverBy::cssSelector("body")
-         )->getText();
+         $this->safeGet($this->url . "/configuration/cohort/");
+        $this->safeFindElement(
+            WebDriverBy::Xpath("//*[@id='bc2']/a[2]/div")
+        )->click();
+        $bodyText = $this->safeFindElement(
+            WebDriverBy::cssSelector("body")
+        )->getText();
 
-         $this->assertContains(
-             "To configure study subprojects click here.",
-             $bodyText
-         );
+        $this->assertStringContainsString(
+            "To configure study cohorts click here.",
+            $bodyText
+        );
     }
     /**
      * Tests links, click each link, the particular content shows on the page.
@@ -148,36 +161,35 @@ class ConfigurationTest extends LorisIntegrationTest
         $this->_linkTest("WWW");
         $this->_linkTest("Dashboard");
         $this->_linkTest("Imaging Modules");
-        $this->_linkTest("Statistics");
+        // $this->_linkTest("Statistics"); will be rewritten by REACT test
         $this->_linkTest("Email");
         $this->_linkTest("Uploads");
         $this->_linkTest("API Keys");
 
     }
     /**
-      * Add a method for testing the link. After click the link,the page
-      * shows particular content.
-      *
-      * @param string $text the text that should be shown in the assert.
-      *
-      * @return void
-      */
+     * Add a method for testing the link. After click the link,the page
+     * shows particular content.
+     *
+     * @param string $text the text that should be shown in the assert.
+     *
+     * @return void
+     */
     private function _linkTest($text)
     {
-        $webElement = $this->safeClick(WebDriverBy::linkText($text));
+        $this->safeClick(WebDriverBy::linkText($text));
         $webActives = $this->webDriver->findElements(
             WebDriverBy::cssSelector(".active")
         );
         $bodyText   = $webActives[1]->getText();
-        $this->assertContains($text, $bodyText);
-
+        $this->assertStringContainsString($text, $bodyText);
     }
 
     /**
-      *  If test on local machine, then run this function.
-      *
-      *  @return void
-      */
+     *  If test on local machine, then run this function.
+     *
+     * @return void
+     */
     public function testLocal()
     {
         $config  =& NDB_Config::singleton();
@@ -185,39 +197,28 @@ class ConfigurationTest extends LorisIntegrationTest
         $sandbox = $dev['sandbox'];
         if ($sandbox == '1') {
 
-            $this->_testSubprojectBreadcrumbs();
-            $this->_testUseProjects();
+            $this->_testCohortBreadcrumbs();
+            $this->_testProjectsLink();
         } else {
             $this->assertEquals(true, 1);
         }
     }
     /**
-      * Test setting useProjects , if useProjects =
-      *
-      *  @return void
-      */
-    private function _testUseProjects()
+     * Test project link appears
+     *
+     * @return void
+     */
+    private function _testProjectsLink()
     {
         $this->safeGet($this->url . "/configuration/");
-        $bodyText = $this->webDriver->findElement(
+        $bodyText = $this->safeFindElement(
             WebDriverBy::cssSelector("body")
         )->getText();
-        $this->assertNotContains(
+        $this->assertStringContainsString(
             "To configure study projects click here.",
             $bodyText
         );
-
-        $this->setUpConfigSetting("useProjects", "true");
-        $this->safeGet($this->url . "/configuration/");
-        $bodyText = $this->webDriver->findElement(
-            WebDriverBy::cssSelector("body")
-        )->getText();
-        $this->assertContains(
-            "To configure study projects click here.",
-            $bodyText
-        );
-        $this->setUpConfigSetting("useProjects", "false");
     }
 
 }
-?>
+

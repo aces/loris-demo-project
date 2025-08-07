@@ -9,7 +9,7 @@
  * @author   Tara Campbell <tara.campbell@mail.mcill.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris-Trunk
-*/
+ */
 
 namespace LORIS\configuration;
 
@@ -23,49 +23,45 @@ namespace LORIS\configuration;
  * @author   Tara Campbell <tara.campbell@mail.mcill.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris-Trunk
-*/
+ */
 class Project extends \NDB_Form
 {
     /**
      * _has_access returns true
      * if the user has the specific permission
      *
-     * @return boolean
+     * @param \User $user The user whose access is being checked
+     *
+     * @return bool
      */
-    function _hasAccess()
+    function _hasAccess(\User $user) : bool
     {
-        // create user object
-        $user =& \User::singleton();
         return $user->hasPermission('config');
     }
 
 
     /**
-    * Loads the project page.
-    *
-    * @return void
-    */
+     * Loads the project page.
+     *
+     * @return void
+     */
     function setup()
     {
         parent::setup();
         $factory     = \NDB_Factory::singleton();
         $config      = $factory->config();
-        $configs     = \NDB_Config::singleton();
-        $useProjects = $config->getSetting("useProjects");
-        if ($useProjects === "true") {
-            $projectList = \Utility::getProjectList();
-            $projects    = array();
-            foreach ($projectList as $ProjectID => $Name) {
-                $projects[$ProjectID] = $config->getProjectSettings($ProjectID);
-                $projects[$ProjectID]['subprojects']
-                    = \Utility::getSubprojectsForProject($ProjectID);
-            }
-            $this->tpl_data['projects'] = $projects;
-        } else {
-            throw new \ConfigurationException(
-                "Projects are not used in this study."
-            );
+        $projectList = \Utility::getProjectList();
+        $cohortList  = \Utility::getCohortList();
+        $projects    = [];
+        foreach (array_keys($projectList) as $ProjectID) {
+            $projects[$ProjectID] = $config->getProjectSettings($ProjectID);
+            $projects[$ProjectID]['projectCohorts']
+                = \Utility::getCohortsForProject(
+                    new \ProjectID(strval($ProjectID))
+                );
         }
+        $this->tpl_data['projects'] = $projects;
+        $this->tpl_data['cohorts']  = $cohortList;
     }
 
     /**

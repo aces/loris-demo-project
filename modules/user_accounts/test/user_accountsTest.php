@@ -2,14 +2,17 @@
 /**
  * User accounts automated integration tests
  *
- * PHP Version 5
+ * PHP Version 7
  *
  * @category Test
  * @package  Loris
- * @author   Nicolas Brossard <nicolasbrossard.mni@gmail.com>
+ * @author   Shen Wang <wangshen.mcin@gmail.com>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverSelect;
+use Facebook\WebDriver\WebDriverKeys;
 require_once __DIR__
     . "/../../../test/integrationtests/LorisIntegrationTest.class.inc";
 /**
@@ -17,42 +20,81 @@ require_once __DIR__
  *
  * @category Test
  * @package  Loris
- * @author   Nicolas Brossard <nicolasbrossard.mni@gmail.com>
+ * @author   Shen Wang <wangshen.mcin@gmail.com>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris
  */
 class UserAccountsIntegrationTest extends LorisIntegrationTest
 {
-    private static $_UNIT_TESTER = array(
-                                    'Data Coordinating Center',
-                                    'UnitTester',
-                                    'Unit Tester',
-                                    'tester@example.com',
-                                    'Y',
-                                    'N',
-                                   );
-    private static $_ADMIN       = array(
-                                    'Data Coordinating Center',
-                                    'admin',
-                                    'Admin account',
-                                    'admin@example.com',
-                                    'Y',
-                                    'N',
-                                   );
+    // The paths to the pages to which the form must submit.
+    private const FILEPATH_EDITUSER = 'user_accounts';
+    // The names of the form elements for the Password and Confirm Password
+    // fields.
+    private const FORM_FIELD_PASSWORD        = 'Password_hash';
+    private const FORM_FIELD_CONFIRMPASSWORD = '__Confirm';
+    // Regular (non-admin) user details
+    private const UNITTESTER_USERNAME  = 'UnitTester';
+    private const UNITTESTER_REALNAME  = 'Unit Tester';
+    private const UNITTESTER_EMAIL     = 'tester@example.com';
+    private const UNITTESTER_EMAIL_NEW = 'newemail@example.com';
+    // Admin user details
+    private const ADMIN_USERNAME  = 'admin';
+    private const ADMIN_REALNAME  = 'Admin account';
+    private const ADMIN_EMAIL     = 'admin@example.com';
+    private const ADMIN_EMAIL_NEW = 'tester@example.com';
+
+    private $_name        = 'input[name="username"]';
+    private $_site        = 'select[name="site"]';
+    private $_clearFilter = ".nav-tabs a";
+    private $_table       = "#dynamictable > tbody > tr";
+    private $_addUserBtn  = ".panel-body .btn-primary:nth-child(1)";
+
     /**
-     * Tests that, when loading the User accounts module, some
-     * text appears in the body.
+     * Does basic setting up of Loris variables for this test, such as
+     * instantiting the config and database objects, creating a user
+     * to user for the tests, and logging in.
      *
      * @return void
      */
-    function testUserAccountsDoespageLoad()
+    public function setUp(): void
     {
-        $this->safeGet($this->url . "/user_accounts/");
-        $bodyText = $this->safeFindElement(
-            WebDriverBy::cssSelector("body")
-        )->getText();
-        $this->assertContains("User Accounts", $bodyText);
+        parent::setUp();
+        $password = new \Password($this->validPassword);
+        $this->DB->insert(
+            "users",
+            [
+                'ID'                     => 999995,
+                'UserID'                 => 'UnitTesterTwo',
+                'Real_name'              => 'Unit Tester 2',
+                'First_name'             => 'Unit 2',
+                'Last_name'              => 'Tester 2',
+                'Email'                  => 'tester2@example.com',
+                'Privilege'              => 0,
+                'PSCPI'                  => 'N',
+                'Active'                 => 'Y',
+                'Password_hash'          => $password,
+                'PasswordChangeRequired' => false,
+                'Pending_approval'       => 'N'
+            ]
+        );
+
+        $this->DB->insert(
+            "user_psc_rel",
+            [
+                'UserID'   => 999995,
+                'CenterID' => 1,
+            ]
+        );
+
+        $this->DB->insert(
+            "user_project_rel",
+            [
+                'UserID'    => 999995,
+                'ProjectID' => 1,
+            ]
+        );
     }
+
     /**
      * Tests that, when loading the User accounts module > edit_user submodule, some
      * text appears in the body.
@@ -65,7 +107,7 @@ class UserAccountsIntegrationTest extends LorisIntegrationTest
         $bodyText = $this->safeFindElement(
             WebDriverBy::cssSelector("body")
         )->getText();
-        $this->assertContains("Edit User", $bodyText);
+        $this->assertStringContainsString("Edit User", $bodyText);
         $this->assertEquals(
             "password",
             $this->safeFindElement(
@@ -84,31 +126,84 @@ class UserAccountsIntegrationTest extends LorisIntegrationTest
                 WebDriverBy::Name("__Confirm")
             )->getAttribute("type")
         );
-    }
-    /**
-     * Tests that, when loading the User accounts module > my_preference submodule
-     * some text appears in the body.
-     *
-     * @return void
-     */
-    function testUserAccountsMyPreferencesDoespageLoad()
-    {
-        $this->safeGet($this->url . "/user_accounts/my_preferences/");
-        $bodyText = $this->safeFindElement(
-            WebDriverBy::cssSelector("body")
-        )->getText();
-        $this->assertContains("My Preferences", $bodyText);
+        $this->assertStringNotContainsString(
+            "You do not have access to this page.",
+            $bodyText
+        );
+        $this->assertStringNotContainsString(
+            "An error occured while loading the page.",
+            $bodyText
+        );
     }
     /**
      * Tests that searching for users using thei user IDs works
      *
      * @return void
      */
-    function testSearchForUsers()
+    function testUserAccountsFilterClearBtn()
     {
-        $this->_assertSearchBy("userID", "my_nonexistent_user_ID", null);
-        $this->_assertSearchBy("userID", "UnitTester", "UnitTester");
+        $this->safeGet($this->url . "/user_accounts/");
+        $this-> _testFilter($this->_name, $this->_table, null, "UnitTester");
+        $this-> _testFilter($this->_site, $this->_table, "1 rows", "3");
     }
+    /**
+     * Testing filter funtion and clear button
+     *
+     * @param string  $element The input element location
+     * @param string  $table   The first row location in the table
+     * @param ?string $records The records number in the table
+     * @param string  $value   The test value
+     *
+     * @return void
+     */
+    function _testFilter($element,$table,$records,$value)
+    {
+        // get element from the page
+        if (strpos($element, "select") === false) {
+            $this->safeFindElement(WebDriverBy::cssSelector($element));
+            $this->webDriver->executescript(
+                "input = document.querySelector('$element');
+                 lastValue = input.value;
+                 input.value = '$value';
+                 event = new Event('input', { bubbles: true });
+                 input._valueTracker.setValue(lastValue);
+                 input.dispatchEvent(event);
+                "
+            );
+            $bodyText = $this->webDriver->executescript(
+                "return document.querySelector('$table').textContent"
+            );
+            $this->assertStringContainsString($value, $bodyText);
+        } else {
+            $this->safeFindElement(WebDriverBy::cssSelector($element));
+            $this->webDriver->executescript(
+                "input = document.querySelector('$element');
+                 input.selectedIndex = '$value';
+                 event = new Event('change', { bubbles: true });
+                 input.dispatchEvent(event);
+                "
+            );
+            $row      = "#default-panel".
+                        " > div > div > div.table-header > div > div >".
+                        " div:nth-child(1)";
+            $bodyText = $this->safeFindElement(
+                WebDriverBy::cssSelector($row)
+            )->getText();
+                    // 4 means there are 4 records under this site.
+                    $this->assertStringContainsString($records, $bodyText);
+        }
+        //test clear filter
+        $btn = $this->_clearFilter;
+        $this->webDriver->executescript(
+            "document.querySelector('$btn').click();"
+        );
+        $inputText = $this->webDriver->executescript(
+            "return document.querySelector('$element').value"
+        );
+        $this->assertEquals("", $inputText);
+    }
+
+
     /**
      * Tests various user account edit operations.
      *
@@ -116,65 +211,40 @@ class UserAccountsIntegrationTest extends LorisIntegrationTest
      */
     function testUserAccountEdits()
     {
-        $this->markTestSkipped("Skipping excessively slow test");
-        return;
+        // Test changing first name
         $this->_verifyUserModification(
-            'user_accounts',
             'UnitTester',
             'First_name',
             'NewFirst'
         );
+        // Test changing last name
         $this->_verifyUserModification(
-            'user_accounts',
             'UnitTester',
             'Last_name',
             'NewLast'
         );
+        // Test changing 'Active' status
         $this->_verifyUserModification(
-            'user_accounts',
-            'UnitTester',
+            'UnitTesterTwo',
             'Active',
             'No'
         );
+        // Test changing Email
         $this->_verifyUserModification(
-            'user_accounts',
             'UnitTester',
             'Email',
             'newemail@example.com'
         );
+        // Test changing Approval status
         $this->_verifyUserModification(
-            'user_accounts',
-            'UnitTester',
+            'UnitTesterTwo',
             'Pending_approval',
             'No'
         );
+        //TODO:add test case to ensure pending_approval
+        //DOES NOT show up on UnitTester since logged in user is UnitTester
     }
-    /**
-     * Tests various My Preference page edit operations.
-     *
-     * @return void
-     */
-    function testMyPreferencesEdits()
-    {
-        $this->_verifyUserModification(
-            'user_accounts/my_preferences',
-            'UnitTester',
-            'First_name',
-            'NewFirst'
-        );
-        $this->_verifyUserModification(
-            'user_accounts/my_preferences',
-            'UnitTester',
-            'Last_name',
-            'NewFirst'
-        );
-        $this->_verifyUserModification(
-            'user_accounts/my_preferences',
-            'UnitTester',
-            'Email',
-            'newemail@example.com'
-        );
-    }
+
     /**
      * Tests that the creation of a new user works.
      *
@@ -182,8 +252,11 @@ class UserAccountsIntegrationTest extends LorisIntegrationTest
      */
     function testAddNewUser()
     {
+        // adding a new user for react test
         $this->safeGet($this->url . "/user_accounts/");
-        $this->safeClick(WebDriverBy::Name('button'));
+        $btn = $this->_addUserBtn;
+        $this->safeClick(WebDriverBy::cssSelector($btn));
+
         $field = $this->safeFindElement(WebDriverBy::Name('UserID'));
         $field->clear();
         $field->sendKeys('userid');
@@ -205,12 +278,14 @@ class UserAccountsIntegrationTest extends LorisIntegrationTest
         $field = $this->safeFindElement(WebDriverBy::Name('__ConfirmEmail'));
         $field->clear();
         $field->sendKeys('email@example.com');
-        $this->safeClick(WebDriverBy::Name('SendEmail'));
         $sitesElement = $this->safeFindElement(WebDriverBy::Name('CenterIDs[]'));
         $sitesOption  = new WebDriverSelect($sitesElement);
         $sitesOption->selectByValue("1");
+        $projectsElement = $this->safeFindElement(WebDriverBy::Name('ProjectIDs[]'));
+        $projectsOption  = new WebDriverSelect($projectsElement);
+        $projectsOption->selectByValue("1");
         $this->safeClick(WebDriverBy::Name('fire_away'));
-        $this->_accessUser('user_accounts', 'userid');
+        $this->_accessUser('userid');
         $field = $this->safeFindElement(WebDriverBy::Name('First_name'));
         $this->assertEquals($field->getAttribute('value'), 'first');
         $field = $this->safeFindElement(WebDriverBy::Name('Last_name'));
@@ -220,11 +295,9 @@ class UserAccountsIntegrationTest extends LorisIntegrationTest
     }
 
     /**
-     * Modifies a field on either the user account or my preferences page
-     * and checks that the modification was recorded in the database.
+     * Modifies a field on either the user account
+     * and checks that the modification was updated on the front-end.
      *
-     * @param string $page      either 'user_accounts' or
-                                'user_accounts/my_preferences'.
      * @param string $userId    ID of the user to modify.
      * @param string $fieldName name of the field (on the HTML page) that should
      *                          be modified.
@@ -232,27 +305,18 @@ class UserAccountsIntegrationTest extends LorisIntegrationTest
      *
      * @return void
      */
-    function _verifyUserModification($page, $userId, $fieldName, $newValue)
+    function _verifyUserModification($userId, $fieldName, $newValue)
     {
-        $this->_accessUser($page, $userId);
-        $field = $this->safeFindElement(WebDriverBy::Name($fieldName));
-        if ($field->getTagName() == 'input') {
-            $field->clear();
-            $field->sendKeys($newValue);
-        } else {
-            $selectField = new WebDriverSelect($field);
-            $selectField->selectByVisibleText($newValue);
-        }
+        // Load the page
+        $this->_accessUser($userId);
 
-        // if working on edit_user, select at least one site
-        if (strpos($page, 'my_preferences') === false) {
-            $sitesElement = $this->safeFindElement(WebDriverBy::Name('CenterIDs[]'));
-            $sitesOption  = new WebDriverSelect($sitesElement);
-            $sitesOption->selectByValue("1");
-        }
-        $this->safeClick(WebDriverBy::Name('fire_away'));
+        // Set the value and submit the changes
+        $this->setValue($fieldName, $newValue);
+        $this->submit();
+        // Reload
+        $this->_accessUser($userId);
 
-        $this->_accessUser($page, $userId);
+        // Verify changes appear on the page
         $field = $this->safeFindElement(WebDriverBy::Name($fieldName));
         if ($field->getTagName() == 'input') {
             $this->assertEquals($field->getAttribute('value'), $newValue);
@@ -264,125 +328,185 @@ class UserAccountsIntegrationTest extends LorisIntegrationTest
             );
         }
     }
+
     /**
-     * Does one of two things: either accesses the My Preferences page of the
-     * current user of the user account page for the user whose ID is passed
-     * as argument.
+     * Submit user data to the form specified by $page.
      *
-     * @param string $page   either 'user_accounts' or
-                             'user_accounts/my_preferences'
+     * @return void
+     */
+    function submit(): void
+    {
+        $sitesElement = $this->safeFindElement(WebDriverBy::Name('CenterIDs[]'));
+        $sitesOption  = new WebDriverSelect($sitesElement);
+        $sitesOption->selectByValue("1");
+
+        $projectsElement = $this->safeFindElement(
+            WebDriverBy::Name('ProjectIDs[]')
+        );
+        $projectsOption  = new WebDriverSelect($projectsElement);
+        $projectsOption->selectByValue("1");
+        $this->safeClick(WebDriverBy::Name('fire_away'));
+    }
+
+    /**
+     * Finds a field on the page and changes its value.
+     * This function should be followed by a submission of a form in order
+     * to actually take effect.
+     *
+     * @param string $fieldName The CSS name of the field.
+     * @param string $newValue  The new value for that field.
+     *
+     * @return void
+     */
+    function setValue($fieldName, $newValue): void
+    {
+        $field = $this->safeFindElement(WebDriverBy::Name($fieldName));
+        if ($field->getTagName() == 'input') {
+            $field->clear();
+            $field->sendKeys($newValue);
+        } else {
+            $selectField = new WebDriverSelect($field);
+            $selectField->selectByVisibleText($newValue);
+        }
+    }
+
+    /**
+     * Ensures that the user cannot set their password to be the same value
+     * as their email address.
+     *
+     * @return void
+     */
+    function testPasswordMustNotEqualEmail(): void
+    {
+        // Make sure the user's email is set to a known value. This will also
+        // load the page.
+        $this->_verifyUserModification(
+            self::UNITTESTER_USERNAME,
+            'Email',
+            self::UNITTESTER_EMAIL_NEW
+        );
+
+        // Try changing the password to the same value.
+        $this->_sendPasswordValues(
+            self::UNITTESTER_USERNAME,
+            self::UNITTESTER_EMAIL_NEW
+        );
+        // This text comes from the class constants in Edit User
+        $this->assertStringContainsString('cannot be your email', $this->getBody());
+    }
+
+    /**
+     * Ensures that the module checks that the password and confirm password
+     * field match.
+     *
+     * @return void
+     */
+    function testPasswordAndConfirmPasswordMustMatch(): void
+    {
+        // Send two different random strings to the password and confirm
+        // password values.
+        $this->_sendPasswordValues(
+            self::UNITTESTER_USERNAME,
+            \Utility::randomString(),
+            \Utility::randomString()
+        );
+        // This text comes from the class constants in Edit User
+        $this->assertStringContainsString('do not match', $this->getBody());
+    }
+
+    /**
+     * Ensures that the module checks that the password and confirm password
+     * field match.
+     *
+     * @return void
+     */
+    function testNewPasswordMustBeDifferent(): void
+    {
+        $newPassword = \Utility::randomString();
+        // Change the user's password to $newPassword
+        $this->_sendPasswordValues(
+            self::UNITTESTER_USERNAME,
+            $newPassword
+        );
+        // Change the password again using the same value. This should cause
+        // and error.
+        $this->_sendPasswordValues(
+            self::UNITTESTER_USERNAME,
+            $newPassword
+        );
+        // This text comes from the class constants in Edit User
+        $this->assertStringContainsString(
+            'New and old passwords are identical',
+            $this->getBody()
+        );
+    }
+
+    /**
+     * Loads a module, sets the password and confirm password value, submits
+     * the form, and reloads the page.
+     *
+     * @param string $userId          The user to edit.
+     * @param string $password        The plaintext password to use
+     * @param string $confirmPassword The plaintext password to use. Will be
+     *                                set equal to $password by default.
+     *
+     * @return void
+     */
+    function _sendPasswordValues(
+        string $userId,
+        string $password,
+        string $confirmPassword = ''
+    ): void {
+        // Go to page
+        $this->_accessUser($userId);
+        $this->setValue(
+            self::FORM_FIELD_PASSWORD,
+            $password
+        );
+        $this->setValue(
+            self::FORM_FIELD_CONFIRMPASSWORD,
+            ($confirmPassword === '') ? $password : $confirmPassword
+        );
+        $this->submit();
+    }
+
+    /**
+     * Returns the body text of the page.
+     *
+     * @return string The HTML body.
+     */
+    function getBody(): string
+    {
+        return $this->safeFindElement(
+            WebDriverBy::cssSelector("body")
+        )->getText();
+    }
+
+    /**
+     * Accesses the current user.
+     *
      * @param string $userId ID of the user whose page should be accessed.
      *
      * @return void
      */
-    function _accessUser($page, $userId)
+    function _accessUser($userId)
     {
-        $this->safeGet($this->url . "/$page/");
-        if ($page == 'user_accounts') {
-            //     $this->safeClick(WebDriverBy::LinkText($userId));
-            $this->safeGet(
-                $this->url . "/user_accounts/edit_user/?identifier="
-                ."$userId"
-            );
-        }
-    }
-    /**
-     * Performs a candidate search using the specified criteria and verifies
-     * the candidates obtained.
-     *
-     * @param array  $elementName     name of the element.
-     * @param string $testData        the testing data
-     * @param string $expectedResults the result that should be returned.
-     *
-     * @return void
-     */
-    private function _assertSearchBy($elementName,$testData,$expectedResults)
-    {
-        {
-            $this->safeGet($this->url . "/user_accounts/");
-            $element = $this->safeFindElement(
-                WebDriverBy::Name($elementName)
-            );
-            $element->clear();
-            $element->sendKeys($testData);
-            }
-            $this->safeClick(WebDriverBy::Name("filter"));
-
-            $this->_assertUserReactTableContents($testData, $expectedResults);
-    }
-    /**
-     * Compares the content of the candidate table with an expected content.
-     *
-     * @param string $className    class name of the HTML table.
-     * @param string $expectedRows array of candidates that the table should contain.
-     *
-     * @return void
-     */
-    private function _assertUserTableContents($className, $expectedRows)
-    {
-        $dataTable = $this->safeFindElement(
-            WebDriverBy::ClassName($className)
+        $this->safeGet(
+            $this->url . "/user_accounts/edit_user/?identifier=$userId"
         );
-        if (is_null($expectedRows)) {
-            $this->assertContains('No users found', $dataTable->getText());
-        } else {
-            $actualRows = $dataTable->findElements(
-                WebDriverBy::xpath('.//tbody//tr')
-            );
-            $this->assertEquals(
-                count($actualRows),
-                count($expectedRows),
-                "Number of users returned should be "
-                . count($expectedRows) . ", not " . count($actualRows)
-            );
-            for ($i=1; $i<=count($actualRows); $i++) {
-                $elements      = $actualRows[$i-1]->findElements(
-                    WebDriverBy::xpath('.//td')
-                );
-                $actualColumns = array();
-                foreach ($elements as $e) {
-                    $actualColumns[] = $e->getText();
-                }
-                $expectedColumns = $expectedRows[$i-1];
-                array_unshift($expectedColumns, "$i");
-                $this->assertEquals(
-                    $actualColumns,
-                    $expectedColumns,
-                    "Users at row $i differ"
-                );
-            }
-        }
-    }
-    /**
-     * Compares the content of the candidate table with an expected content.
-     *
-     * @param string $testData     the test data
-     * @param string $expectedRows array of candidates that the table
-     *                                                       should contain.
-     *
-     * @return void
-     */
-    private function _assertUserReactTableContents($testData,$expectedRows)
-    {
-        $dataTable =  $this->safeGet($this->url . "/user_accounts/?format=json")
-            ->getPageSource();
-        if (is_null($expectedRows)) {
-            $this->assertContains('"Data":[]', $dataTable);
-        } else {
-
-             $this->assertContains($testData, $dataTable);
-
-        }
     }
     /**
      * Performed after every test.
      *
      * @return void
      */
-    function tearDown()
+    function tearDown(): void
     {
-        $this->DB->delete("users", array("UserID" => 'userid'));
+        $this->DB->delete("users", ["UserID" => 'userid']);
+        $this->DB->delete("user_psc_rel", ["UserID" => 999995]);
+        $this->DB->delete("user_project_rel", ["UserID" => 999995]);
+        $this->DB->delete("users", ["UserID" => 'UnitTesterTwo']);
         parent::tearDown();
     }
 }
-?>
+

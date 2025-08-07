@@ -1,0 +1,22 @@
+#!/bin/bash
+echo "##### CLEARING DATA RELEASE UPLOADS #####" >&2 &&
+rm -rf /data/data_release_uploads/* &&
+echo "##### CLEARING DOCUMENT REPOSITORY UPLOADS #####" >&2 &&
+rm -rf /data/document_repository_uploads/* &&
+echo "##### CLEARING GENOMICS UPLOADS #####" >&2 &&
+rm -rf /data/genomics/* &&
+echo "##### CLEARING MRI UPLOADS #####" >&2 &&
+rm -rf /data/incoming/* &&
+rm -rf /data/imagingData/* &&
+echo "##### CLEARING DEFAULT DOWNLOADS #####" >&2 &&
+rm -rf /data/download/* &&
+echo "##### CLEARING MEDIA UPLOADS #####" >&2 &&
+rm -rf /data/mediaUploads/* &&
+echo "##### CLEARING PUBLICATION UPLOADS #####" >&2 &&
+rm -rf /data/publication_uploads/* &&
+echo "##### CLEARING ISSUE TRACKER UPLOADS #####" >&2 &&
+rm -rf /data/issue_tracker/* &&
+echo "##### CLEARING INSTRUMENT MANAGER UPLOADS #####" >&2 &&
+find /var/www/loris/project/instruments/ -type f -not -name "bmi.linst" -not -name "bmi.meta" -not -name "bmi.readme" -not -name "bmi.rules" -not -name "bmi.score" -not -name "NDB_BVL_Instrument_radiology_review.class.inc" -not -name "NDB_BVL_Instrument_mri_parameter_form.class.inc" -not -name "NDB_BVL_Instrument_medical_history.class.inc" -not -name "NDB_BVL_Instrument_aosi.class.inc" -not -name "eeg_acquisition_form.rules" -not -name "eeg_acquisition_form.meta" -not -name "eeg_acquisition_form.linst" -not -name "README.md" -delete;
+
+

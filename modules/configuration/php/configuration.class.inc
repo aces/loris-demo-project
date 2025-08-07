@@ -2,19 +2,19 @@
 /**
  * The configuration module is used to manage the configuration of Loris.
  *
- * PHP version 5
+ * PHP version 7
  *
  * @category Behavioural
  * @package  Main
  * @author   Tara Campbell <tara.campbell@mail.mcill.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris-Trunk
-*/
+ */
 
 namespace LORIS\configuration;
 
 /**
- * Admin_Config Class
+ * Configuration Class
  *
  * This class is to configure the system settings
  *
@@ -23,54 +23,76 @@ namespace LORIS\configuration;
  * @author   Tara Campbell <tara.campbell@mail.mcill.ca>
  * @license  http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link     https://github.com/aces/Loris-Trunk
-*/
+ */
 class Configuration extends \NDB_Form
 {
     /**
      * _has_access returns true
      * if the user has the specific permission
      *
-     * @return boolean
+     * @param \User $user The user whose access is being checked
+     *
+     * @return bool
      */
-    function _hasAccess()
+    function _hasAccess(\User $user) : bool
     {
-        // create user object
-        $user =& \User::singleton();
         return $user->hasPermission('config');
     }
 
      /**
-     * Loads the main configuration module page.
-     *
-     * @return void
-     */
+      * Loads the main configuration module page.
+      *
+      * @return void
+      */
     function setup()
     {
         parent::setup();
-        $config =& \NDB_Config::singleton();
-        $DB     =& \Database::singleton();
+        $config = \NDB_Config::singleton();
+        $DB     = $this->loris->getDatabaseConnection();
 
-        $scans = $DB->pselect(
+        $scans      = $DB->pselect(
             "SELECT Scan_type
              FROM mri_scan_type",
-            array()
+            []
         );
+        $scan_types = ['' => ''];
         foreach ($scans as $type) {
             $val = $type['Scan_type'];
-            $scan_types[$val] =$val;
+            $scan_types[$val] = $val;
         }
-        $scan_types = array_merge(array('' => ''), $scan_types);
 
-        $instruments = \Utility::getAllInstruments();
-        $instruments = array_merge(array('' => ''), $instruments);
+        $date_format = [
+            ''    => '',
+            'Ymd' => 'Ymd (EX: 2015-12-28)',
+            'Ym'  => 'Ym (EX: 2015-12)'
+        ];
 
-        $this->tpl_data['useProjects']     = $config->getSetting("useProjects");
+        $instruments     = \NDB_BVL_Instrument::getInstrumentNamesList($this->loris);
+        $instruments[''] = '';
+
         $this->tpl_data['parentMenuItems'] = $this->_getParentConfigLabels();
         $this->tpl_data['config']          = $this->_getConfigSettingTree();
         $this->tpl_data['instruments']     = $instruments;
         $this->tpl_data['sandbox']         = $config->getSetting("sandbox");
         $this->tpl_data['scan_types']      = $scan_types;
+        $this->tpl_data['log_levels']      = [
+            'none'      => 'None',
+            'debug'     => 'Debug',
+            'info'      => 'Info',
+            'notice'    => 'Notice',
+            'warning'   => 'Warning',
+            'error'     => 'Error',
+            'critical'  => 'Critical',
+            'alert'     => 'Alert',
+            'emergency' => 'Emergency',
+        ];
 
+        $this->tpl_data['date_format']   = $date_format;
+        $this->tpl_data['lookup_center'] = [
+            ''            => '',
+            'PatientID'   => 'PatientID',
+            'PatientName' => 'PatientName',
+        ];
     }
 
     /**
@@ -81,13 +103,13 @@ class Configuration extends \NDB_Form
      */
     function _getParentConfigLabels()
     {
-        $this->DB = \Database::singleton();
+        $DB = $this->loris->getDatabaseConnection();
 
-        $parentConfigItems = $this->DB->pselect(
+        $parentConfigItems = $DB->pselect(
             "SELECT Label, Name 
              FROM ConfigSettings 
              WHERE Parent IS NULL AND Visible=1 ORDER BY OrderNumber",
-            array()
+            []
         );
 
         return $parentConfigItems;
@@ -103,12 +125,13 @@ class Configuration extends \NDB_Form
      */
     function _getConfigSettingTree()
     {
-        $config =& \NDB_Config::singleton();
+        $config = \NDB_Config::singleton();
+        $DB     = $this->loris->getDatabaseConnection();
 
         // Get the names and meta-information for the config settings in the database
-        $configs = $this->DB->pselect(
+        $configs = $DB->pselect(
             "SELECT * FROM ConfigSettings WHERE Visible=1 ORDER BY OrderNumber",
-            array()
+            []
         );
 
         // Check whether any setting is overwritten in the config.xml
@@ -134,9 +157,9 @@ class Configuration extends \NDB_Form
         // overridden in the config.xml
         foreach ($configs as &$setting) {
             if ($setting['Disabled'] == 'No') {
-                $value = $this->DB->pselect(
+                $value = $DB->pselect(
                     "SELECT ID, Value FROM Config WHERE ConfigID=:ID",
-                    array('ID' => $setting{'ID'})
+                    ['ID' => $setting['ID']]
                 );
                 if ($value) {
                     foreach ($value as $subvalue) {
@@ -147,8 +170,9 @@ class Configuration extends \NDB_Form
         }
 
         // build a tree from configs array
+        $tree = [];
         foreach ($configs as &$node) {
-            $node['Children']  = array();
+            $node['Children']  = [];
             $tree[$node['ID']] = &$node;
 
         }
@@ -172,18 +196,18 @@ class Configuration extends \NDB_Form
         $deps    = parent::getJSDependencies();
         return array_merge(
             $deps,
-            array(
-             $baseURL . "/configuration/js/configuration_helper.js",
-            )
+            [
+                $baseURL . "/configuration/js/configuration_helper.js",
+            ]
         );
     }
 
      /**
-        * Include additional CSS files:
-        *  1. configuration
-        *
-        * @return array of CSS to be inserted
-        */
+      * Include additional CSS files:
+      *  1. configuration
+      *
+      * @return array of CSS to be inserted
+      */
     function getCSSDependencies()
     {
         $factory = \NDB_Factory::singleton();
