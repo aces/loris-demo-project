@@ -7,5 +7,8 @@ instruments/bmi.readme
 instruments/bmi.rules
 instruments/bmi.score
 instruments/bmi.meta
+instruments/eeg_acquisition_form.linst
+instruments/eeg_acquisition_form.meta
+instruments/eeg_acquisition_form.rules
 tables_sql/crontab.sql
 tables_sql/drop_all_tables_statements.sql
