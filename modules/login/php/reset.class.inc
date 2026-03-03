@@ -182,5 +182,4 @@ class Reset extends \NDB_Page implements ETagCalculator
     {
         return true;
     }
-
 }

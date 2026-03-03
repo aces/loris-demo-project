@@ -12,3 +12,9 @@ instruments/eeg_acquisition_form.meta
 instruments/eeg_acquisition_form.rules
 tables_sql/crontab.sql
 tables_sql/drop_all_tables_statements.sql
+instruments/instrument_sql/*
+**/js/**
+modules/configuration/js/DiagnosisEvolution.js.map
+**/locale/**/*.json
+**/*.mo
+modules/configuration/js/DiagnosisEvolution.js.map

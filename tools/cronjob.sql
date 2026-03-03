@@ -32,3 +32,10 @@ WHERE cs.Name='DoubleDataEntryInstruments';
 -- Set user pass demo20!7
 UPDATE users SET Pending_approval='N', Active='Y', Password_hash='$2y$10$6pjQ.x5rPY7voNFs2w/eI.pzLL8H/9wPZ98nabvBOEwDBClhK0l1S' WHERE UserID='admin';
 INSERT INTO user_login_history (userID,Success,Page_requested) VALUE ('admin','Y','/');
+
+-- INSERT LANGUAGES
+SET NAMES 'utf8mb4';
+INSERT INTO language (language_code, language_label) VALUES
+('fr_CA','Français'),
+('hi_IN','हिन्दी'),
+('ja_JP','日本語');
