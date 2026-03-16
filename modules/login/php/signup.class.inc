@@ -113,7 +113,8 @@ class Signup extends \NDB_Page implements ETagCalculator
         );
         $site     = $values['site'];
         $project  = $values['project'];
-        $fullname = $name . ' ' . $lastname;
+        $language_preference = $values['language_preference'] ?? null;
+        $fullname            = $name . ' ' . $lastname;
 
         $vals = [
             'UserID'               => $from,
@@ -124,6 +125,14 @@ class Signup extends \NDB_Page implements ETagCalculator
             'Email'                => $from,
             'account_request_date' => date('Y-m-d'),
         ];
+
+        // Add language_preference if provided and valid
+        if (!is_null($language_preference) && !empty($language_preference)) {
+            $languageList = \Utility::getLanguageList();
+            if (array_key_exists($language_preference, $languageList)) {
+                $vals['language_preference'] = $language_preference;
+            }
+        }
 
         // Check if email address is valid.
         if (preg_match('/(<|>|"|&)/', $from)) {
@@ -143,11 +152,11 @@ class Signup extends \NDB_Page implements ETagCalculator
         }
 
         // Check email address' uniqueness
-        $result = $DB->pselectOne(
+        $result   = $DB->pselectOne(
             "SELECT COUNT(*) FROM users WHERE Email=:VEmail OR UserID=:VEmail",
             ['VEmail' => $from]
         );
-
+        $siteList = \Utility::getSiteList();
         if ($result == 0) {
             // insert into DB only if email address doesn't exist
             $DB->insert('users', $vals);
@@ -155,7 +164,6 @@ class Signup extends \NDB_Page implements ETagCalculator
             $user_id = $DB->getLastInsertId();
 
             // verify site exists
-            $siteList = \Utility::getSiteList();
             if (!is_null($site) && array_key_exists($site, $siteList)) {
                 $DB->insert(
                     'user_psc_rel',
@@ -248,15 +256,17 @@ class Signup extends \NDB_Page implements ETagCalculator
                 // Send email to users with User Management permissions.
                 $config    = \NDB_Factory::singleton()->config();
                 $studyName = $config->getSetting('title');
-
+                $baseURL   = \NDB_Factory::singleton()->settings()->getBaseURL();
                 \Email::send(
                     $row['Email'],
                     'request_account.tpl',
                     [
                         'Study'     => $studyName,
-                        'UserID'    => $from,
+                        'Site'      => $siteList[$site],
                         'Real_name' => $fullname,
                         'Email'     => $from,
+                        'URL'       => $baseURL
+                                       . "/user_accounts/?pendingApproval=Y",
                     ]
                 );
             }
@@ -306,5 +316,4 @@ class Signup extends \NDB_Page implements ETagCalculator
     {
         return true;
     }
-
 }

@@ -40,7 +40,7 @@ foreach ($_POST as $key => $value) {
             // A blank value is the same as deleting.
             //############################ DEMO ############################
             // $DB->delete('Config', ['ID' => $key]);
-            //############################ DEMO ############################        } else {
+            //############################ DEMO ############################
             if (! noDuplicateInDropdown($key, $value)) {
                 // Don't alter the table if the same key was passed twice.
                 continue;
@@ -150,6 +150,7 @@ foreach ($_POST as $key => $value) {
     }
     unset($pathIDs);
 }
+
 /**
  * Check Duplicate value
  *
@@ -171,6 +172,7 @@ function isDuplicate($key, $value): bool
     );
     return intval($result) > 0;
 }
+
 /**
  * Check dropdown list Duplicate value
  *
@@ -205,6 +207,7 @@ function noDuplicateInDropdown($id,$value)
        // it means Dropdown menu has already had the same configID and value pair.
        return ($id == $IDBefore || $IDBefore == null);
 }
+
 /**
  * Query DB for config settings that correspond to filepaths.
  * Depending on the context, either the Config or ConfigSettings table can be
