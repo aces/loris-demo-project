@@ -2,6 +2,9 @@ instruments/NDB_BVL_Instrument_aosi.class.inc
 instruments/NDB_BVL_Instrument_medical_history.class.inc
 instruments/NDB_BVL_Instrument_mri_parameter_form.class.inc
 instruments/NDB_BVL_Instrument_radiology_review.class.inc
+instruments/eeg_acquisition_form.linst
+instruments/eeg_acquisition_form.meta
+instruments/eeg_acquisition_form.rules
 instruments/bmi.linst
 instruments/bmi.readme
 instruments/bmi.rules
