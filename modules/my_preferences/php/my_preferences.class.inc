@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace LORIS\my_preferences;
 
 /**
@@ -47,7 +48,12 @@ class My_Preferences extends \NDB_Form
         foreach ($fieldsThatAreStrings as $fieldName) {
             // this check prevents PHP Notices
             if (!empty($defaults[$fieldName])) {
-                $defaults[$fieldName] = htmlspecialchars($defaults[$fieldName]);
+                $defaults[$fieldName] = htmlspecialchars(
+                    $defaults[$fieldName],
+                    ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5,
+                    'UTF-8',
+                    false
+                );
             }
         }
 
@@ -430,7 +436,6 @@ class My_Preferences extends \NDB_Form
         $errors['Password_hash']
             = 'Password change has been disabled on the LORIS Demo.';
         //############################ DEMO ############################
-
 
         // Validate email
         $emailError = $this->_getEmailError($DB, $values['Email']);

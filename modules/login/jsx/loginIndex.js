@@ -8,12 +8,13 @@ import Loader from 'Loader';
 import Panel from 'Panel';
 import DOMPurify from 'dompurify';
 import {
-    FormElement,
-    StaticElement,
-    TextboxElement,
-    PasswordElement,
-    ButtonElement,
+  FormElement,
+  StaticElement,
+  TextboxElement,
+  PasswordElement,
+  ButtonElement,
 } from 'jsx/Form';
+import SummaryStatistics from './summaryStatistics';
 
 /**
  * Login form.
@@ -39,10 +40,11 @@ class Login extends Component {
       },
       form: {
         value: {
-          /*########################## DEMO ##########################*/
+          /*########################## DEMO ##########################*/ 
           username: 'admin',
           password: 'demo20!7',
-          /*########################## DEMO ##########################*/        },
+          /*########################## DEMO ##########################*/ 
+        },
         error: {
           toggle: false,
           message: '',
@@ -54,6 +56,7 @@ class Login extends Component {
         requestAccount: null,
         expiredPassword: null,
       },
+      summaryStatistics: null,
       isLoaded: false,
     };
     // Bind component instance to custom methods
@@ -68,8 +71,7 @@ class Login extends Component {
    * Executes after component mounts.
    */
   componentDidMount() {
-    this.fetchData()
-      .then(() => this.setState({isLoaded: true}));
+    this.fetchData();
   }
 
   /**
@@ -92,8 +94,18 @@ class Login extends Component {
         // request account setup.
         state.component.requestAccount = json.requestAccount;
         state.oidc = json.oidc;
-        state.isLoaded = true;
         this.setState(state);
+      }).then(() => {
+        fetch(window.location.origin + '/login/summary_statistics', {
+          method: 'GET',
+        })
+          .then((resp) => resp.json())
+          .then((json) => {
+            this.setState({
+              summaryStatistics: json,
+              isLoaded: true,
+            });
+          });
       }).catch((error) => {
         this.setState({error: true});
         console.error(error);
@@ -205,14 +217,15 @@ class Login extends Component {
         <div>
           <section className={'study-logo'}>
             <img src={this.state.study.logo}
-                 alt={this.state.study.title}/>
+              alt={this.state.study.title}/>
           </section>
           <FormElement
             name={'loginIndex'}
             action={''}
             fileUpload={false}
             onSubmit={this.handleSubmit}
-          >{/*########################## DEMO ##########################
+          >
+          {/*########################## DEMO ##########################
             <TextboxElement
               name={'username'}
               value={this.state.form.value.username}
@@ -231,8 +244,7 @@ class Login extends Component {
               required={true}
               autoComplete={'current-password'}
             />
-            ########################## DEMO #########################
-            */}
+            ########################## DEMO ##########################*/}
             {error}
             <ButtonElement
               label={'Login'}
@@ -245,10 +257,10 @@ class Login extends Component {
           </FormElement>
           <div className={'help-links'}>
             <a onClick={() => this.setMode('reset')}
-               style={{cursor: 'pointer'}}>Forgot your password?</a>
+              style={{cursor: 'pointer'}}>Forgot your password?</a>
             <br/>
             <a onClick={() => this.setMode('request')}
-               style={{cursor: 'pointer'}}>Request Account</a>
+              style={{cursor: 'pointer'}}>Request Account</a>
           </div>
           {oidc}
           <div className={'help-text'}>
@@ -277,8 +289,18 @@ class Login extends Component {
                 collapsing={false}
                 bold={true}
               >
-                {study}
+                <div
+                  className='study-description'
+                >
+                  {
+                    this.state.summaryStatistics
+                    && <SummaryStatistics data={this.state.summaryStatistics}/>
+                  }
+                  {study}
+                </div>
               </Panel>
+            </section>
+            <section>
             </section>
           </div>
         </div>
@@ -321,18 +343,18 @@ class Login extends Component {
    * @return {JSX}
    */
   getOIDCLinks() {
-      if (!this.state.oidc) {
-          return null;
-      }
-      return (<div className={'oidc-links'}>
-        {this.state.oidc.map((val) => {
-            return <div>
-                <a href={'/oidc/login?loginWith=' + val}>
+    if (!this.state.oidc) {
+      return null;
+    }
+    return (<div className={'oidc-links'}>
+      {this.state.oidc.map((val) => {
+        return <div>
+          <a href={'/oidc/login?loginWith=' + val}>
                     Login with {val}
-                </a>
-            </div>;
-        })}
-      </div>);
+          </a>
+        </div>;
+      })}
+    </div>);
   }
 }
 
